@@ -1,15 +1,23 @@
+import { Environment } from '@react-three/drei/core/Environment'
+import { Lightformer } from '@react-three/drei/core/Lightformer'
+
 function StudioLighting() {
   return (
     <>
-      <hemisphereLight args={['#f1f0eb', '#34373e', 1.3]} />
+      <Environment resolution={256} frames={1} environmentIntensity={0.7}>
+        <Lightformer position={[-3, 4, -3]} target={[0, 1, 0]} scale={[3, 5, 1]} intensity={4} color="#fff5e7" />
+        <Lightformer position={[4, 2, 1]} target={[0, 1, 0]} scale={[2, 4, 1]} intensity={3} color="#c7d8ef" />
+        <Lightformer position={[0, 5, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[4, 2, 1]} intensity={2} />
+      </Environment>
+      <hemisphereLight args={['#f1f0eb', '#34373e', 0.65]} />
       <directionalLight
-        position={[-3, 6, 4]} intensity={3.2} color="#fff5e7" castShadow
-        shadow-mapSize={[1024, 1024]} shadow-bias={-0.0002} shadow-normalBias={0.025}
+        position={[-3, 6, -4]} intensity={2.6} color="#fff5e7" castShadow
+        shadow-mapSize={[2048, 2048]} shadow-bias={-0.0002} shadow-normalBias={0.015} shadow-radius={3}
         shadow-camera-left={-3} shadow-camera-right={3} shadow-camera-top={3} shadow-camera-bottom={-3}
         shadow-camera-near={0.5} shadow-camera-far={15}
       />
-      <directionalLight position={[4, 2, -3]} intensity={2} color="#b5c6de" />
-      <directionalLight position={[1, 3, 5]} intensity={0.5} color="#f1f0eb" />
+      <directionalLight position={[4, 3, 3]} intensity={1.8} color="#b5c6de" />
+      <directionalLight position={[1, 2, -5]} intensity={1} color="#f1f0eb" />
     </>
   )
 }
@@ -29,7 +37,7 @@ export function ProductStage() {
         </mesh>
         <mesh position={[0, 0.31, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[1.24, 1.24, 0.06, 96]} />
-          <meshStandardMaterial color="#a3a7ad" metalness={0.4} roughness={0.42} />
+          <meshStandardMaterial color="#454a52" metalness={0.55} roughness={0.48} />
         </mesh>
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.348, 0]}>
           <torusGeometry args={[1.17, 0.007, 8, 96]} />

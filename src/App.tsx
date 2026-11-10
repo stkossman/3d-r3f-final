@@ -18,8 +18,8 @@ function App() {
           <div className="pt-4 pb-12 max-[680px]:pt-0">
             <h1 className="font-display text-[clamp(4rem,7.3vw,6rem)] leading-[0.95] font-semibold tracking-[-0.025em] uppercase max-[680px]:text-[clamp(3.5rem,14.5vw,6rem)]" id="hero-title">Engineered<br />for the <em className="text-signal not-italic">edge.</em></h1>
             <p className="mt-8 max-w-[30ch] text-lg leading-[1.6] text-steel max-[680px]:max-w-[34ch]">A closer look at the intersection of protection, precision, and personal expression.</p>
-            <a className="mt-8 inline-flex items-center gap-6 border-b border-steel pb-2 text-sm" href="#experience">Discover what’s ahead <ArrowUpRight size={18} aria-hidden="true" /></a>
-            <div className="mt-14 flex flex-wrap items-center gap-2.5 text-xs text-steel max-[680px]:mt-8"><span className="size-[5px] rounded-full bg-signal" aria-hidden="true" /> In development <span>/</span> Scene foundation</div>
+            <a className="mt-8 inline-flex items-center gap-6 border-b border-steel pb-2 text-sm" href="#experience">Discover the experience <ArrowUpRight size={18} aria-hidden="true" /></a>
+            <div className="mt-14 flex flex-wrap items-center gap-2.5 text-xs text-steel max-[680px]:mt-8"><span className="size-[5px] rounded-full bg-signal" aria-hidden="true" /> Interactive study <span>/</span> Explore & Design</div>
           </div>
           <ProductViewer />
           <div className="col-span-full mt-10 flex justify-between gap-4 pb-6 text-[0.6875rem] text-steel max-[680px]:mt-6 max-[680px]:items-end"><span>APEX / 01</span><span className="max-[680px]:max-w-[23ch] max-[680px]:text-right">A study in form. An exploration of force.</span></div>

@@ -1,5 +1,39 @@
 # Helmet asset review
 
+## Stages 2–4: verified runtime derivative
+
+The review sections below record Stage 0–1 preparation. Their earlier licensing/visual uncertainties and provisional scale are superseded by this section.
+
+On 2026-11-10 the [public Sketchfab model API](https://api.sketchfab.com/v3/models/1124fa1f754645d7b9d54de84009d463) confirmed the title, author Miopass, and CC Attribution linking CC BY 4.0. The ordinary model page still returned 403. This independently matches embedded provenance; it does not establish separate rights to third-party logos/livery. The runtime derivative carries source/author/license links and modification details in `public/models/NOTICE.txt`, linked visibly beside the viewer. No publication was performed.
+
+| Artifact | Bytes | Decision |
+| --- | --- | --- |
+| Original GLB | 60,024,940 | Unchanged, ignored; SHA-256 `6b2c779831b578258b2fc2d140e97bb3ed3b678ec9aea96155fa341e3376a5c2` |
+| 2K runtime GLB | 9,286,304 | Shipped; 84.53% smaller, 8.86 MiB |
+| 1K comparison GLB | 3,106,988 | Generated/loaded temporarily, not shipped; smaller graphics lose fine readability |
+| Tonal shell map | 60,642 | Additional 2K WebP for custom shell colors; original hues remain in Factory |
+
+Reproduce with `bun run assets:helmet`. To prepare a temporary 1K comparison: `bun scripts/prepare-helmet.mjs <temporary-output.glb> 1024`. The source must exist locally. glTF Transform 4.5.1, Meshoptimizer 1.3.0 and Sharp 0.35.5 are development-only. The generated `helmet.glb.json` records source/output hashes, all node/mesh identities, triangle counts and texture sizes.
+
+The script sequentially resizes all twelve 4096px PNG images to 2048px WebP: quality 92 for base color, lossless encoding after resizing for normal and metallic/roughness maps. It uses glTF Transform's medium Meshopt quantization/reordering, without joining, flattening or simplifying parts. All 13 nodes, four named meshes/materials, and 98,724 triangles are preserved. No topology reduction was necessary to meet the transfer target. Original, 2K and 1K models were loaded in the same browser scene for comparison; the retained 2K version preserves visible livery and silhouette at tested framing. Fine texture fidelity is reduced from the original 4K maps, and geometry is quantized.
+
+Preparation initially exposed intermittent Bun/Sharp crashes and a native-buffer lifetime problem that could corrupt the first WebP. The final pipeline copies encoded bytes into owned Uint8Arrays, limits Sharp concurrency/cache and validates each embedded output image before replacing the GLB. Repeated successful 2K runs produced SHA-256 `2a090fb5d3a0c9fcb0ad74951afc8da353e1e7e55c6e7b02a1b963504df7fe42`. Source hashing remained unchanged. Do not remove output validation.
+
+Required GLB extensions are Meshopt geometry decoding, mesh quantization and WebP; original physical-material extensions remain. Drei enables its bundled Meshopt decoder, with Draco disabled. WebP is browser decoded. Draco would add another decoder without solving the dominant texture payload. KTX2 could reduce GPU residency but needs a separate encoding/transcoder pipeline and target-device checks; it was not added. Twelve 2K RGBA images still imply about 192 MiB before mipmaps / 256 MiB with mipmaps; this is an estimate, not measured GPU memory. No 30/60fps mobile guarantee is made.
+
+Visual evidence confirms upright Y and front negative Z with exporter ancestors retained. Runtime normalization uses precise loaded vertex bounds rather than accessor bounds: longest dimension 1.85, center X/Z and bottom Y 0.345. Approximate final bounds: X ±0.679, Y 0.345–1.734, Z ±0.925. No real physical dimensions are claimed.
+
+Verified part mapping remains:
+
+- `Helmet_main_Helmet_main_0`: paint and baked livery; owned physical material, original normal/roughness maps. Custom tones use a separate grayscale/tonal version of its base map; Factory restores the original.
+- `Helmet_Component_Helmet_Component_0`: fixed components with original alpha/detail maps; no invented accent controls.
+- `Helmet_inside_Helmet_inside_0`: rough nonmetallic interior.
+- `Helmet_glass_Helmet_glass_0`: visor **plus fixed crown inserts and lower trim**. An isolated mesh browser view verified these additional pieces. Tint affects all of them and is labeled Visor & trim tint. No pivot is authored. Opening/closing is omitted because rotating this mesh would move fixed pieces; separating it is required first.
+
+The source's broad BLEND/double-sided settings were evaluated: exterior shell is front-sided; transparent/internal parts retain source sidedness; glass keeps alpha but disables depth writes and uses reflective tint instead of expensive transmission. Original textures/geometry are shared read-only; cloned materials and the tonal texture are owned by the instance. Shell casts real shadows; glass does not cast an opaque silhouette.
+
+All three component notes refer to visible shell, visor and chin intake shapes. Anchors use normalized display coordinates and raycast occlusion with DOM equivalents. The reference model is a visual artifact, not evidence of certification, construction material, airflow or impact performance.
+
 ## Evidence and selection
 
 Selected: **Candidate B — F1 Helmet ZhouGuanyu 24 by Miopass**, subject to optimization and visual validation in Stage 2. Its separate named shell and visor enable customization and visor animation without first separating geometry. It also matches the motorsport brief. Candidate A is lighter to transfer but combines all geometry in one primitive/material, making those interactions substantially harder.

@@ -1,0 +1,146 @@
+{
+  "source": "assets/candidates/f1-zhou/f1_helmet_zhouguanyu_24.glb",
+  "output": "public/models/helmet.glb",
+  "textureSize": 2048,
+  "originalBytes": 60024940,
+  "optimizedBytes": 9286304,
+  "sourceSha256": "6b2c779831b578258b2fc2d140e97bb3ed3b678ec9aea96155fa341e3376a5c2",
+  "optimizedSha256": "2a090fb5d3a0c9fcb0ad74951afc8da353e1e7e55c6e7b02a1b963504df7fe42",
+  "meshNames": [
+    "Helmet_main_Helmet_main_0",
+    "Helmet_Component_Helmet_Component_0",
+    "Helmet_inside_Helmet_inside_0",
+    "Helmet_glass_Helmet_glass_0"
+  ],
+  "nodes": [
+    "Sketchfab_model",
+    "acc1551671c84325a90059c1234ccf20.fbx",
+    "RootNode",
+    "Cinema_4D_���������",
+    "Object_4",
+    "Helmet_main",
+    "Helmet_main_Helmet_main_0",
+    "Helmet_Component",
+    "Helmet_Component_Helmet_Component_0",
+    "Helmet_inside",
+    "Helmet_inside_Helmet_inside_0",
+    "Helmet_glass",
+    "Helmet_glass_Helmet_glass_0"
+  ],
+  "triangles": [
+    {
+      "name": "Helmet_main_Helmet_main_0",
+      "count": 25296
+    },
+    {
+      "name": "Helmet_Component_Helmet_Component_0",
+      "count": 14652
+    },
+    {
+      "name": "Helmet_inside_Helmet_inside_0",
+      "count": 2736
+    },
+    {
+      "name": "Helmet_glass_Helmet_glass_0",
+      "count": 56040
+    }
+  ],
+  "textures": [
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "",
+      "size": [
+        2048,
+        2048
+      ],
+      "mimeType": "image/webp"
+    }
+  ]
+}

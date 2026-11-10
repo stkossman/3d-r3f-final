@@ -1,0 +1,16 @@
+F1 Helmet ZhouGuanyu 24 by Miopass
+Source: https://sketchfab.com/3d-models/f1-helmet-zhouguanyu-24-1124fa1f754645d7b9d54de84009d463
+Author: https://sketchfab.com/miopass
+License: Creative Commons Attribution 4.0 International
+https://creativecommons.org/licenses/by/4.0/
+
+The public Sketchfab API confirmed author and CC Attribution 4.0 on 2026-11-10.
+Modifications for APEX / 01: textures resized from 4096 to 2048 pixels;
+base color encoded as quality-92 WebP, normal and metallic/roughness maps
+encoded as lossless WebP after resizing; geometry quantized and compressed
+with Meshopt. Four mesh identities and original livery are retained.
+Runtime material variants and display normalization are applied in the viewer.
+shell-tone.webp is an additional monochrome/tonal derivative of the shell
+base-color texture for custom colors. The factory variant retains the livery.
+No endorsement by the original author, driver, teams, or sponsors is implied.
+Third-party trademarks and livery remain the property of their owners.

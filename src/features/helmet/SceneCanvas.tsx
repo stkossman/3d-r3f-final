@@ -4,11 +4,17 @@ import { useEffect, useState, type RefObject } from 'react'
 import { ViewerFallback } from './ProductViewer'
 import { SceneCamera, type ViewerCameraHandle } from './SceneCamera'
 import { ProductStage } from './ProductStage'
+import { HelmetModel } from './HelmetModel'
+import type { HelmetConfiguration, HotspotId } from './helmetConfiguration'
 
 type SceneCanvasProps = {
   cameraRef: RefObject<ViewerCameraHandle | null>
   touchActive: boolean
   onReady: (ready: boolean) => void
+  configuration: HelmetConfiguration
+  showHotspots: boolean
+  selectedHotspot: HotspotId | null
+  onHotspot: (id: HotspotId) => void
 }
 
 function RendererLifecycle({ onReady, onFailure }: Pick<SceneCanvasProps, 'onReady'> & { onFailure: (failed: boolean) => void }) {
@@ -29,7 +35,7 @@ function RendererLifecycle({ onReady, onFailure }: Pick<SceneCanvasProps, 'onRea
   return null
 }
 
-export default function SceneCanvas({ cameraRef, touchActive, onReady }: SceneCanvasProps) {
+export default function SceneCanvas({ cameraRef, touchActive, onReady, configuration, showHotspots, selectedHotspot, onHotspot }: SceneCanvasProps) {
   const [failed, setFailed] = useState(false)
   if (failed) return <ViewerFallback />
 
@@ -54,6 +60,7 @@ export default function SceneCanvas({ cameraRef, touchActive, onReady }: SceneCa
       <RendererLifecycle onReady={onReady} onFailure={setFailed} />
       <SceneCamera ref={cameraRef} />
       <ProductStage />
+      <HelmetModel configuration={configuration} showHotspots={showHotspots} selectedHotspot={selectedHotspot} onHotspot={onHotspot} />
     </Canvas>
   )
 }
