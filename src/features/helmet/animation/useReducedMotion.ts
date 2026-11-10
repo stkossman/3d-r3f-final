@@ -8,5 +8,9 @@ const subscribe = (notify: () => void) => {
 }
 
 export function useReducedMotion() {
-  return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches, () => true)
+  return useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(query).matches,
+    () => true,
+  )
 }

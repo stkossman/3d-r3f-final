@@ -14,23 +14,48 @@
   --spacing-page: clamp(1.25rem, 5vw, 6rem);
 }
 @layer base {
-:root {
-  font-family: var(--font-sans);
-  color: var(--color-ivory);
-  background: var(--color-graphite);
-  color-scheme: dark;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scrollbar-color: var(--color-steel) var(--color-graphite);
-}
-body { margin: 0; min-width: 320px; }
-* { box-sizing: border-box; }
-a { color: inherit; text-decoration: none; text-underline-offset: 0.3em; }
-a:hover { color: var(--color-signal); }
-:focus-visible { outline: 2px solid var(--color-signal); outline-offset: 6px; }
-::selection { background: var(--color-signal); color: var(--color-graphite); }
-h1, h2, h3, p, figure { margin: 0; }
-svg { flex-shrink: 0; }
+  :root {
+    font-family: var(--font-sans);
+    color: var(--color-ivory);
+    background: var(--color-graphite);
+    color-scheme: dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scrollbar-color: var(--color-steel) var(--color-graphite);
+  }
+  body {
+    margin: 0;
+    min-width: 320px;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+    text-underline-offset: 0.3em;
+  }
+  a:hover {
+    color: var(--color-signal);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 6px;
+  }
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-graphite);
+  }
+  h1,
+  h2,
+  h3,
+  p,
+  figure {
+    margin: 0;
+  }
+  svg {
+    flex-shrink: 0;
+  }
 }

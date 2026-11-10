@@ -1,10 +1,16 @@
 import { useLayoutEffect } from 'react'
 import { useThree } from '@react-three/fiber'
 
-type SceneReadinessProps = { onReady: (ready: boolean) => void; onUnavailable: () => void }
+type SceneReadinessProps = {
+  onReady: (ready: boolean) => void
+  onUnavailable: () => void
+}
 
 // Mounts only after the model, textures and Rapier have resolved Suspense.
-export function SceneReadiness({ onReady, onUnavailable }: SceneReadinessProps) {
+export function SceneReadiness({
+  onReady,
+  onUnavailable,
+}: SceneReadinessProps) {
   const get = useThree((state) => state.get)
   useLayoutEffect(() => {
     const { gl, scene, camera, invalidate } = get()
@@ -18,11 +24,19 @@ export function SceneReadiness({ onReady, onUnavailable }: SceneReadinessProps) 
     const originalAfterRender = scene.onAfterRender
     const originalShaderError = gl.debug.onShaderError
 
-    const handleShaderError: NonNullable<typeof gl.debug.onShaderError> = (context, program, vertex, fragment) => {
-      if (context.getShaderSource(fragment)?.includes('APEX_DIAGNOSTIC_SCAN')) recoveringScan = true
+    const handleShaderError: NonNullable<typeof gl.debug.onShaderError> = (
+      context,
+      program,
+      vertex,
+      fragment,
+    ) => {
+      if (context.getShaderSource(fragment)?.includes('APEX_DIAGNOSTIC_SCAN'))
+        recoveringScan = true
       else {
         fatal = true
-        queueMicrotask(() => { if (!cancelled) onUnavailable() })
+        queueMicrotask(() => {
+          if (!cancelled) onUnavailable()
+        })
       }
       originalShaderError?.(context, program, vertex, fragment)
     }
@@ -39,25 +53,34 @@ export function SceneReadiness({ onReady, onUnavailable }: SceneReadinessProps) 
       firstFrame = requestAnimationFrame(() => {
         secondFrame = requestAnimationFrame(() => {
           if (cancelled || fatal) return
-          if (recoveringScan) { firstFrame = 0; invalidate(); return }
+          if (recoveringScan) {
+            firstFrame = 0
+            invalidate()
+            return
+          }
           reported = true
           onReady(true)
         })
       })
     }
 
-    Promise.all([gl.compileAsync(scene, camera), document.fonts.ready]).then(() => {
-      if (cancelled || fatal) return
-      prepared = true
-      invalidate()
-    }).catch(() => { if (!cancelled) onUnavailable() })
+    Promise.all([gl.compileAsync(scene, camera), document.fonts.ready])
+      .then(() => {
+        if (cancelled || fatal) return
+        prepared = true
+        invalidate()
+      })
+      .catch(() => {
+        if (!cancelled) onUnavailable()
+      })
 
     return () => {
       cancelled = true
       cancelAnimationFrame(firstFrame)
       cancelAnimationFrame(secondFrame)
       scene.onAfterRender = originalAfterRender
-      if (gl.debug.onShaderError === handleShaderError) gl.debug.onShaderError = originalShaderError
+      if (gl.debug.onShaderError === handleShaderError)
+        gl.debug.onShaderError = originalShaderError
       onReady(false)
     }
   }, [get, onReady, onUnavailable])

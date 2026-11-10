@@ -1,6 +1,14 @@
 import { useLayoutEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { Color, Matrix4, Mesh, MeshStandardMaterial, Uniform, type Group, type Object3D } from 'three'
+import {
+  Color,
+  Matrix4,
+  Mesh,
+  MeshStandardMaterial,
+  Uniform,
+  type Group,
+  type Object3D,
+} from 'three'
 import scanVertex from './diagnostic.vert.glsl'
 import scanFragment from './diagnostic.frag.glsl'
 import { HELMET_PARTS } from '../model/helmetMaterials'
@@ -25,13 +33,30 @@ function createScanUniforms() {
   }
 }
 
-export function useDiagnosticScan(model: Group, { scanRequest, exploreActive, impactActive, impactCollisions, onScanStatus }: DiagnosticScanProps) {
+export function useDiagnosticScan(
+  model: Group,
+  {
+    scanRequest,
+    exploreActive,
+    impactActive,
+    impactCollisions,
+    onScanStatus,
+  }: DiagnosticScanProps,
+) {
   const get = useThree((state) => state.get)
   const invalidate = useThree((state) => state.invalidate)
   const reduced = useReducedMotion()
   const failed = useRef(false)
-  const previous = useRef({ request: scanRequest, collisions: impactCollisions })
-  const playback = useRef({ active: false, elapsed: 0, duration: 2.2, impact: false })
+  const previous = useRef({
+    request: scanRequest,
+    collisions: impactCollisions,
+  })
+  const playback = useRef({
+    active: false,
+    elapsed: 0,
+    duration: 2.2,
+    impact: false,
+  })
   const uniformsRef = useRef<ReturnType<typeof createScanUniforms> | null>(null)
   if (uniformsRef.current === null) uniformsRef.current = createScanUniforms()
 
@@ -41,7 +66,11 @@ export function useDiagnosticScan(model: Group, { scanRequest, exploreActive, im
     if (!uniforms) return
     if (failed.current) return
     const shell = model.getObjectByName(HELMET_PARTS.shell)
-    if (!(shell instanceof Mesh) || !(shell.material instanceof MeshStandardMaterial)) return
+    if (
+      !(shell instanceof Mesh) ||
+      !(shell.material instanceof MeshStandardMaterial)
+    )
+      return
     const material = shell.material
     const originalCompile = material.onBeforeCompile
     const originalCacheKey = material.customProgramCacheKey
@@ -70,28 +99,57 @@ export function useDiagnosticScan(model: Group, { scanRequest, exploreActive, im
       playback.current.active = false
       uniforms.uScanIntensity.value = 0
       restoreMaterial()
-      queueMicrotask(() => { if (!disposed) { onScanStatus('unavailable'); invalidate() } })
+      queueMicrotask(() => {
+        if (!disposed) {
+          onScanStatus('unavailable')
+          invalidate()
+        }
+      })
     }
 
     material.onBeforeCompile = (shader, renderer) => {
       originalCompile.call(material, shader, renderer)
-      if (!shader.vertexShader.includes('#include <begin_vertex>') || !shader.fragmentShader.includes('#include <opaque_fragment>')) {
+      if (
+        !shader.vertexShader.includes('#include <begin_vertex>') ||
+        !shader.fragmentShader.includes('#include <opaque_fragment>')
+      ) {
         disableScan()
         return
       }
       Object.assign(shader.uniforms, uniforms)
-      shader.vertexShader = scanVertex + '\n' + shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\napexScanVertex(transformed);')
-      shader.fragmentShader = scanFragment + '\n' + shader.fragmentShader.replace('#include <opaque_fragment>', 'outgoingLight += apexDiagnosticScan();\n#include <opaque_fragment>')
+      shader.vertexShader =
+        scanVertex +
+        '\n' +
+        shader.vertexShader.replace(
+          '#include <begin_vertex>',
+          '#include <begin_vertex>\napexScanVertex(transformed);',
+        )
+      shader.fragmentShader =
+        scanFragment +
+        '\n' +
+        shader.fragmentShader.replace(
+          '#include <opaque_fragment>',
+          'outgoingLight += apexDiagnosticScan();\n#include <opaque_fragment>',
+        )
     }
     material.customProgramCacheKey = () => `${baseKey}/apex-diagnostic-v1`
     material.needsUpdate = true
 
     gl.debug.onShaderError = (context, program, vertex, fragment) => {
-      const diagnostic = context.getShaderSource(fragment)?.includes('APEX_DIAGNOSTIC_SCAN')
+      const diagnostic = context
+        .getShaderSource(fragment)
+        ?.includes('APEX_DIAGNOSTIC_SCAN')
       if (diagnostic) disableScan()
       // Preserve full compile/link diagnostics, including in the optional shader fallback.
-      if (previousErrorHandler) previousErrorHandler(context, program, vertex, fragment)
-      else console.error('APEX shader compilation failed', context.getProgramInfoLog(program), context.getShaderInfoLog(vertex), context.getShaderInfoLog(fragment))
+      if (previousErrorHandler)
+        previousErrorHandler(context, program, vertex, fragment)
+      else
+        console.error(
+          'APEX shader compilation failed',
+          context.getProgramInfoLog(program),
+          context.getShaderInfoLog(vertex),
+          context.getShaderInfoLog(fragment),
+        )
     }
     invalidate()
     return () => {
@@ -111,7 +169,12 @@ export function useDiagnosticScan(model: Group, { scanRequest, exploreActive, im
     const playScan = exploreActive && requested
     const playImpact = impactActive && collided
     if (playScan || playImpact) {
-      playback.current = { active: true, elapsed: 0, duration: reduced ? 0.4 : playImpact ? 0.55 : 2.2, impact: playImpact }
+      playback.current = {
+        active: true,
+        elapsed: 0,
+        duration: reduced ? 0.4 : playImpact ? 0.55 : 2.2,
+        impact: playImpact,
+      }
       onScanStatus(playScan ? 'scanning' : 'ready')
       invalidate()
     } else if (playback.current.impact ? !impactActive : !exploreActive) {
@@ -120,7 +183,15 @@ export function useDiagnosticScan(model: Group, { scanRequest, exploreActive, im
       onScanStatus('ready')
       invalidate()
     }
-  }, [scanRequest, exploreActive, impactActive, impactCollisions, reduced, invalidate, onScanStatus])
+  }, [
+    scanRequest,
+    exploreActive,
+    impactActive,
+    impactCollisions,
+    reduced,
+    invalidate,
+    onScanStatus,
+  ])
 
   useLayoutEffect(() => {
     const uniforms = uniformsRef.current
@@ -145,7 +216,12 @@ export function useDiagnosticScan(model: Group, { scanRequest, exploreActive, im
     const progress = Math.min(run.elapsed / run.duration, 1)
     uniforms.uScanTime.value = reduced ? 0 : run.elapsed
     uniforms.uScanProgress.value = reduced ? 0.5 : progress
-    uniforms.uScanIntensity.value = progress === 1 ? 0 : (reduced ? 0.3 : Math.sin(progress * Math.PI) * (run.impact ? 0.55 : 0.8))
+    uniforms.uScanIntensity.value =
+      progress === 1
+        ? 0
+        : reduced
+          ? 0.3
+          : Math.sin(progress * Math.PI) * (run.impact ? 0.55 : 0.8)
     if (progress === 1) {
       run.active = false
       onScanStatus('ready')

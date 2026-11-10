@@ -13,7 +13,8 @@ const options: LenisOptions = {
   // ProductViewer handles local links so hashes, history and skip-link focus survive.
   anchors: false,
   stopInertiaOnNavigate: true,
-  prevent: (node) => node.matches('input, textarea, select, [contenteditable="true"]'),
+  prevent: (node) =>
+    node.matches('input, textarea, select, [contenteditable="true"]'),
 }
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
@@ -36,5 +37,9 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  return <ReactLenis root ref={lenis} options={options}>{children}</ReactLenis>
+  return (
+    <ReactLenis root ref={lenis} options={options}>
+      {children}
+    </ReactLenis>
+  )
 }

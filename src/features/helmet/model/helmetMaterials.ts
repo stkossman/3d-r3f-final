@@ -7,7 +7,10 @@ export const HELMET_PARTS = {
   visor: 'Helmet_glass_Helmet_glass_0',
 } as const
 
-export function createHelmetMaterial(source: MeshStandardMaterial, meshName: string) {
+export function createHelmetMaterial(
+  source: MeshStandardMaterial,
+  meshName: string,
+) {
   const material = source.clone()
   material.envMapIntensity = 0.85
   material.dithering = true

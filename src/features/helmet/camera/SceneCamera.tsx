@@ -24,7 +24,13 @@ const VIEW_DIRECTIONS = {
   threeQuarter: HOME_DIRECTION,
 }
 
-export function SceneCamera({ ref, enabled = true }: { ref: Ref<ViewerCameraHandle>; enabled?: boolean }) {
+export function SceneCamera({
+  ref,
+  enabled = true,
+}: {
+  ref: Ref<ViewerCameraHandle>
+  enabled?: boolean
+}) {
   const controls = useRef<OrbitControlsImpl>(null)
   const camera = useThree((state) => state.camera)
   const scene = useThree((state) => state.scene)
@@ -32,7 +38,14 @@ export function SceneCamera({ ref, enabled = true }: { ref: Ref<ViewerCameraHand
   const invalidate = useThree((state) => state.invalidate)
   const reducedMotion = useReducedMotion()
   const target = useRef(new Vector3(0, HELMET_CENTER_Y, 0))
-  const transition = useRef({ active: false, elapsed: 0, start: new Spherical(), goal: new Spherical(), current: new Spherical(), offset: new Vector3() })
+  const transition = useRef({
+    active: false,
+    elapsed: 0,
+    start: new Spherical(),
+    goal: new Spherical(),
+    current: new Spherical(),
+    offset: new Vector3(),
+  })
 
   function cancelTransition() {
     transition.current.active = false
@@ -45,14 +58,24 @@ export function SceneCamera({ ref, enabled = true }: { ref: Ref<ViewerCameraHand
     const motion = transition.current
     orbit.enableDamping = false
     orbit.update()
-    motion.start.setFromVector3(motion.offset.copy(camera.position).sub(target.current))
-    motion.goal.setFromVector3(motion.offset.copy(direction).multiplyScalar(distance))
-    const angleDifference = MathUtils.euclideanModulo(motion.goal.theta - motion.start.theta + Math.PI, Math.PI * 2) - Math.PI
+    motion.start.setFromVector3(
+      motion.offset.copy(camera.position).sub(target.current),
+    )
+    motion.goal.setFromVector3(
+      motion.offset.copy(direction).multiplyScalar(distance),
+    )
+    const angleDifference =
+      MathUtils.euclideanModulo(
+        motion.goal.theta - motion.start.theta + Math.PI,
+        Math.PI * 2,
+      ) - Math.PI
     motion.goal.theta = motion.start.theta + angleDifference
     motion.elapsed = 0
     motion.active = !reducedMotion
     if (reducedMotion) {
-      camera.position.copy(target.current).add(motion.offset.setFromSpherical(motion.goal))
+      camera.position
+        .copy(target.current)
+        .add(motion.offset.setFromSpherical(motion.goal))
       orbit.update()
       orbit.enableDamping = true
     }
@@ -71,7 +94,9 @@ export function SceneCamera({ ref, enabled = true }: { ref: Ref<ViewerCameraHand
       MathUtils.lerp(motion.start.phi, motion.goal.phi, amount),
       MathUtils.lerp(motion.start.theta, motion.goal.theta, amount),
     )
-    camera.position.copy(target.current).add(motion.offset.setFromSpherical(motion.current))
+    camera.position
+      .copy(target.current)
+      .add(motion.offset.setFromSpherical(motion.current))
     orbit.update()
     if (progress === 1) cancelTransition()
     else invalidate()
@@ -89,14 +114,22 @@ export function SceneCamera({ ref, enabled = true }: { ref: Ref<ViewerCameraHand
 
     // Fit a bounding sphere in the tighter axis, so every orbit stays in frame.
     const verticalHalfFov = MathUtils.degToRad(camera.fov / 2)
-    const horizontalHalfFov = Math.atan(Math.tan(verticalHalfFov) * size.width / size.height)
-    const minimum = DISPLAY_RADIUS * (presentation?.scale.x ?? 1) / Math.sin(Math.min(verticalHalfFov, horizontalHalfFov))
+    const horizontalHalfFov = Math.atan(
+      (Math.tan(verticalHalfFov) * size.width) / size.height,
+    )
+    const minimum =
+      (DISPLAY_RADIUS * (presentation?.scale.x ?? 1)) /
+      Math.sin(Math.min(verticalHalfFov, horizontalHalfFov))
     const zoomRatio = camera.position.distanceTo(target.current) / minimum
     const direction = camera.position.clone().sub(target.current).normalize()
     orbit.minDistance = minimum
     orbit.maxDistance = minimum * 1.65
-    camera.position.copy(target.current).addScaledVector(direction, minimum * MathUtils.clamp(zoomRatio, 1, 1.65))
-    orbit.position0.copy(target.current).addScaledVector(HOME_DIRECTION, minimum * 1.12)
+    camera.position
+      .copy(target.current)
+      .addScaledVector(direction, minimum * MathUtils.clamp(zoomRatio, 1, 1.65))
+    orbit.position0
+      .copy(target.current)
+      .addScaledVector(HOME_DIRECTION, minimum * 1.12)
     orbit.target0.copy(target.current)
     orbit.update()
     orbit.enableDamping = true
@@ -113,7 +146,9 @@ export function SceneCamera({ ref, enabled = true }: { ref: Ref<ViewerCameraHand
       const orbit = controls.current
       if (!orbit) return
       cancelTransition()
-      orbit.setAzimuthalAngle(orbit.getAzimuthalAngle() + direction * Math.PI / 12)
+      orbit.setAzimuthalAngle(
+        orbit.getAzimuthalAngle() + (direction * Math.PI) / 12,
+      )
       invalidate()
     },
     zoom: (closer) => {
@@ -130,5 +165,19 @@ export function SceneCamera({ ref, enabled = true }: { ref: Ref<ViewerCameraHand
     },
   }))
 
-  return <OrbitControls ref={controls} enabled={enabled} makeDefault onStart={cancelTransition} enablePan={false} enableDamping dampingFactor={0.12} rotateSpeed={0.55} zoomSpeed={0.6} minPolarAngle={Math.PI / 8} maxPolarAngle={Math.PI / 2.25} />
+  return (
+    <OrbitControls
+      ref={controls}
+      enabled={enabled}
+      makeDefault
+      onStart={cancelTransition}
+      enablePan={false}
+      enableDamping
+      dampingFactor={0.12}
+      rotateSpeed={0.55}
+      zoomSpeed={0.6}
+      minPolarAngle={Math.PI / 8}
+      maxPolarAngle={Math.PI / 2.25}
+    />
+  )
 }

@@ -9,6 +9,8 @@ import { SmoothScroll } from './features/helmet/animation/SmoothScroll'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <SmoothScroll><App /></SmoothScroll>
+    <SmoothScroll>
+      <App />
+    </SmoothScroll>
   </StrictMode>,
 )
