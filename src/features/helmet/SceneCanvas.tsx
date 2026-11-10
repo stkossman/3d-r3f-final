@@ -6,7 +6,7 @@ import { SceneCamera, type ViewerCameraHandle } from './SceneCamera'
 import type { LightingConfiguration } from './studioLighting'
 import { CinematicRig } from './CinematicRig'
 import type { MotionValue } from 'motion/react'
-import { ProductStage, StudioLighting } from './ProductStage'
+import { StudioLighting } from './ProductStage'
 import { HelmetModel } from './HelmetModel'
 import type { HelmetConfiguration, HotspotId } from './helmetConfiguration'
 
@@ -62,12 +62,10 @@ export default function SceneCanvas({ cameraRef, inspecting, progress, onReady, 
       onContextMenu={(event) => event.preventDefault()}
     >
       <color attach="background" args={['#181b21']} />
-      <fog attach="fog" args={['#181b21', 9, 18]} />
       <RendererLifecycle onReady={onReady} onFailure={setFailed} />
       <SceneCamera ref={cameraRef} enabled={inspecting} />
       <StudioLighting configuration={lighting} />
       <CinematicRig progress={progress} inspecting={inspecting} noteOpen={showHotspots && selectedHotspot !== null}>
-        <ProductStage />
         <HelmetModel configuration={configuration} showHotspots={showHotspots} selectedHotspot={selectedHotspot} onHotspot={onHotspot} onCloseNote={onCloseNote} />
       </CinematicRig>
     </Canvas>
