@@ -2,7 +2,7 @@
 
 ## Evidence and selection
 
-Selected: **Candidate B — F1 Helmet ZhouGuanyu 24 by Miopass**, subject to optimization and visual validation in Stage 1. Its separate named shell and visor enable customization and visor animation without first separating geometry. It also matches the motorsport brief. Candidate A is lighter to transfer but combines all geometry in one primitive/material, making those interactions substantially harder.
+Selected: **Candidate B — F1 Helmet ZhouGuanyu 24 by Miopass**, subject to optimization and visual validation in Stage 2. Its separate named shell and visor enable customization and visor animation without first separating geometry. It also matches the motorsport brief. Candidate A is lighter to transfer but combines all geometry in one primitive/material, making those interactions substantially harder.
 
 Inspection was read-only: parsed each local GLB v2 JSON chunk, indexed accessors, node hierarchy, material records, embedded buffer views, and PNG IHDR dimensions. No source file was converted, modified, or copied into the runtime. No visual model/render inspection was performed; texture fidelity, UV seams, transparency quality, and hinge behavior remain unverified. Only GLBs were found locally; embedded FBX node names do not prove an FBX source is available.
 
@@ -51,6 +51,16 @@ The metadata points to [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
 Planned attribution: “F1 Helmet ZhouGuanyu 24” by Miopass, via Sketchfab, CC BY 4.0; append a precise modification note when a derivative exists. Keep the source, author, and license links with that credit. Stage 0 includes no model in `public/`, imports, or distribution output.
 
-## Stage 1 entry checklist
+## Stage 1 read-only preparation
+
+Re-inspected the selected local file during Stage 1: GLB v2, 60,024,940 bytes, 13 nodes, four meshes, and 12 embedded PNG images. Composed node matrices and transformed POSITION accessor bounds from the default scene. The resulting aggregate AABB is approximately X 2.108492 × Y 2.157412 × Z 2.872401; center (-0.000005, 0.197247, -0.031236); Y minimum -0.881458. These are accessor-derived conservative bounds, not rendered vertex measurements or physical dimensions. Exporter axis rotations and 0.01 scale are encoded in matrices, not node TRS fields. The separate non-mesh branch does not affect these bounds.
+
+The visor bound occupies negative Z (approximately -1.467 to 0.181), suggesting that direction is the front; this is an inference requiring visual confirmation. Do not add an arbitrary axis correction before viewing the imported result with ancestor transforms intact.
+
+The Stage 1 podium has radius 1.24 and top Y 0.34. A provisional Stage 2 longest-axis size of 1.7 presentation units implies uniform scale approximately 0.59184 and resulting dimensions 1.248 × 1.277 × 1.700. Center X/Z and place the measured Y minimum on the podium, using a parent group to preserve part transforms. This leaves a deliberate platform margin; final framing and scale require visual review. Presentation units are not meters and cannot drive physics without a separately justified physical calibration.
+
+Stage 2 should load a separately prepared local GLB derivative using Drei `useGLTF` under the existing lazy Canvas/Suspense and error boundary. Inspect actual loaded bounds after normalization; preserve shell/component/inside/glass names; isolate any mutable materials. Preserve the source, compare 1K/2K and supported KTX2 texture options, then consider mesh/geometry compression after measurement. Target <=10 MB transfer as a preparation goal, not a result. No conversion, model loading, source copying, or redistribution occurred in Stage 1. Final visual quality, facing, hinge behavior, runtime compatibility, and current licensing/provenance remain unverified.
+
+## Stage 2 entry checklist
 
 Confirm provenance; visually inspect shell/glass separation, livery maps, and hinge placement; prepare and compare an optimized derivative; record dimensions and part mappings; add attribution with the actual runtime asset. Source models and archives remain ignored and unchanged.

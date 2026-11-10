@@ -11,6 +11,7 @@
   --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   --spacing-page: clamp(1.25rem, 5vw, 6rem);
 }
+@layer base {
 :root {
   font-family: var(--font-sans);
   color: var(--color-ivory);
@@ -32,4 +33,5 @@ h1, h2, h3, p, figure { margin: 0; }
 svg { flex-shrink: 0; }
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
+}
 }

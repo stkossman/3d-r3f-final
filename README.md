@@ -2,7 +2,7 @@
 
 **Interactive Motorsport Helmet Experience** · Engineered for the edge.
 
-A university final project exploring a racing helmet through three planned modes: Explore, Design, and Impact Lab. Stage 0 establishes the visual identity and technical foundation; the 3D experience is not implemented yet.
+A university final project exploring a racing helmet through three planned modes: Explore, Design, and Impact Lab. Stage 1 adds an interactive primitive product display; the helmet itself arrives in Stage 2.
 
 ## Run locally
 
@@ -21,9 +21,9 @@ Open the local URL printed by Vite. `preview` serves the production output after
 
 ## Stack and current status
 
-React 19, TypeScript 5.9 in strict mode, Vite 7, Tailwind CSS 4, and GLSL imports through `vite-plugin-glsl`. Three.js, React Three Fiber, Drei, Rapier, postprocessing, Zustand, and Motion are installed for later stages; none enter the Stage 0 application bundle. Lucide supplies the navigation icons.
+React 19, TypeScript 5.9 in strict mode, Vite 7, Tailwind CSS 4, and GLSL imports through `vite-plugin-glsl`. Three.js, React Three Fiber, and Drei power the lazy-loaded scene. Rapier, postprocessing, Zustand, and Motion remain unused. Lucide supplies UI icons.
 
-Implemented: responsive DOM shell, semantic navigation, keyboard skip link and focus styles, graphite/ivory tokens, restrained signal orange, self-hosted Barlow typography, future viewer reservation, and explicitly upcoming mode previews. No WebGL canvas, model loading, camera controls, configurator, physics, shaders, or postprocessing yet. No deployment has been performed.
+Implemented: responsive Tailwind-first DOM shell, semantic navigation, keyboard skip link and focus styles, graphite/ivory tokens, restrained signal orange, self-hosted Barlow typography, a layered primitive podium with lighting and shadows, bounded orbit/zoom/reset controls, loading/error/WebGL fallback, and explicitly upcoming mode previews. Touch interaction is opt-in to preserve page scrolling. No model, configurator, physics, custom shaders, or postprocessing yet. No deployment has been performed.
 
 Source helmet candidates remain local in ignored `assets/candidates/`; a clean clone does not include them. The selected F1 model requires runtime preparation before integration. Fonts are bundled from `@fontsource/barlow` and `@fontsource/barlow-condensed`; their OFL notices are retained in `public/fonts/`.
 
@@ -34,4 +34,4 @@ Source helmet candidates remain local in ignored `assets/candidates/`; a clean c
 - [Stages 0–7 and completion criteria](docs/roadmap.md)
 - [Contributor and agent instructions](AGENTS.md)
 
-Next: Stage 1 introduces a restrained product scene with an optimized helmet, loading/error handling, lighting, shadows, and responsive framing. Subsequent stages add inspection, customization, physics, shaders, and final performance/deployment work. Work only on the requested stage.
+Next: Stage 2 prepares and integrates the optimized helmet and adds model-specific exploration. Source bounds and preparation requirements are recorded in the asset review. Subsequent stages add customization, physics, shaders, and final rendering/performance work. Work only on the requested stage.
