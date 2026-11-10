@@ -65,7 +65,9 @@ export function CinematicRig({ onImpactFramed, impactActive, impactHeight, bodyR
       const position = bodyRef.current.translation()
       const orientation = bodyRef.current.rotation()
       positionGoal.current.set(position.x, position.y, position.z).multiplyScalar(DISPLAY_UNITS_PER_METER)
-      rotationGoal.current.set(orientation.x, orientation.y, orientation.z, orientation.w)
+      // Rapier's float32 quaternion needs normalization for Three's slerp/angleTo.
+      // Otherwise roundoff can keep the framing angle above its settling threshold.
+      rotationGoal.current.set(orientation.x, orientation.y, orientation.z, orientation.w).normalize()
       scale = HELMET_METERS_PER_UNIT * DISPLAY_UNITS_PER_METER
       const labCenter = (impactHeight + 0.3) * DISPLAY_UNITS_PER_METER / 2
       distance = Math.max(3.2, (impactHeight + 0.45) * DISPLAY_UNITS_PER_METER / 2) / Math.sin(tightFov)
