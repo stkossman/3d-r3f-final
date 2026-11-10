@@ -1,6 +1,9 @@
+import { Physics, type RapierRigidBody } from '@react-three/rapier'
+import { ImpactWorld } from './ImpactWorld'
+import type { ImpactHandle, ImpactSettings, ImpactTelemetry } from './impactSimulation'
 import { Canvas, useThree } from '@react-three/fiber'
 import { ACESFilmicToneMapping, PCFShadowMap, SRGBColorSpace } from 'three'
-import { useEffect, useState, type RefObject } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { ViewerFallback } from './ProductViewer'
 import { SceneCamera, type ViewerCameraHandle } from './SceneCamera'
 import type { LightingConfiguration } from './studioLighting'
@@ -11,6 +14,11 @@ import { HelmetModel } from './HelmetModel'
 import type { HelmetConfiguration, HotspotId } from './helmetConfiguration'
 
 type SceneCanvasProps = {
+  onImpactFramed: (framed: boolean) => void
+  impactActive: boolean
+  impactSettings: ImpactSettings
+  impactHandle: RefObject<ImpactHandle | null>
+  onImpactTelemetry: (telemetry: ImpactTelemetry) => void
   cameraRef: RefObject<ViewerCameraHandle | null>
   inspecting: boolean
   progress: MotionValue<number>
@@ -41,7 +49,8 @@ function RendererLifecycle({ onReady, onFailure }: Pick<SceneCanvasProps, 'onRea
   return null
 }
 
-export default function SceneCanvas({ cameraRef, inspecting, progress, onReady, configuration, lighting, showHotspots, selectedHotspot, onHotspot, onCloseNote }: SceneCanvasProps) {
+export default function SceneCanvas({ onImpactFramed, impactActive, impactSettings, impactHandle, onImpactTelemetry, cameraRef, inspecting, progress, onReady, configuration, lighting, showHotspots, selectedHotspot, onHotspot, onCloseNote }: SceneCanvasProps) {
+  const body = useRef<RapierRigidBody>(null)
   const [failed, setFailed] = useState(false)
   if (failed) return <ViewerFallback />
 
@@ -65,7 +74,10 @@ export default function SceneCanvas({ cameraRef, inspecting, progress, onReady, 
       <RendererLifecycle onReady={onReady} onFailure={setFailed} />
       <SceneCamera ref={cameraRef} enabled={inspecting} />
       <StudioLighting configuration={lighting} />
-      <CinematicRig progress={progress} inspecting={inspecting} noteOpen={showHotspots && selectedHotspot !== null}>
+      <Physics paused timeStep={1 / 60} interpolate={false} gravity={[0, -9.81, 0]} colliders={false} numSolverIterations={6} maxCcdSubsteps={2}>
+        <ImpactWorld active={impactActive} settings={impactSettings} bodyRef={body} handleRef={impactHandle} onTelemetry={onImpactTelemetry} />
+      </Physics>
+      <CinematicRig onImpactFramed={onImpactFramed} impactActive={impactActive} impactHeight={impactSettings.height} bodyRef={body} progress={progress} inspecting={inspecting} noteOpen={showHotspots && selectedHotspot !== null}>
         <HelmetModel configuration={configuration} showHotspots={showHotspots} selectedHotspot={selectedHotspot} onHotspot={onHotspot} onCloseNote={onCloseNote} />
       </CinematicRig>
     </Canvas>

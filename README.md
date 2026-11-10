@@ -15,6 +15,7 @@ bun run typecheck
 bun run lint
 bun run build
 bun run preview
+bun scripts/verify-impact.ts
 ```
 
 Preview serves the local production build; it does not deploy. Preserve bun.lock.
@@ -25,7 +26,7 @@ Preview serves the local production build; it does not deploy. Preserve bun.lock
 - **Explore:** three keyboard-accessible numbered markers open component notes inside the viewer. Notes follow projected anchors, clamp to the viewport, and close with the marker, close button or Escape. Dashed markers indicate occluded anchors while remaining accessible.
 - **Design:** existing Factory/Stealth/Apex presets, shell tones, finishes and visor-and-trim tints modify owned PBR materials. Restore factory recovers the original livery.
 - **Lighting:** Studio/Contrast/Warm presets, a 0.65–1.35× key-light control and Reset lighting change actual lights. Material and lighting choices persist across checkpoints.
-- **Impact Lab:** an explicitly upcoming preview. No physics, custom shaders or postprocessing are implemented.
+- **Impact Lab:** real Rapier drops with height/bounce controls, pause/resume, reset/replay and contact telemetry. Assumed 0.34 m length / 1.5 kg mass and simplified colliders make this an illustrative experiment, not a helmet safety test. Scroll exit resets physics; tab hiding pauses it. No custom shaders or postprocessing.
 
 Cinematic mode leaves wheel and touch input to the document. Explicit **Inspect** enables orbit, bounded zoom, camera presets and reset; **Return to cinematic** blends back to the current scroll composition. One Canvas/model remains mounted. Mobile uses centered framing and controls below the scene; opening a note makes room for its card. Reduced motion removes cinematic rotation and uses immediate composition changes. Loading, model errors and WebGL/context-loss fallbacks preserve the page and disable unavailable controls.
 

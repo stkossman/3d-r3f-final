@@ -7,6 +7,8 @@ import { LightingControls } from './LightingControls'
 import { DEFAULT_LIGHTING, type LightingConfiguration } from './studioLighting'
 import { DesignControls } from './DesignControls'
 import { FACTORY_CONFIGURATION, type HelmetConfiguration, type HotspotId } from './helmetConfiguration'
+import { ImpactControls } from './ImpactControls'
+import { useImpactLab } from './impactSimulation'
 import { CHECKPOINTS } from './scrollChoreography'
 import { useReducedMotion } from './useReducedMotion'
 
@@ -38,6 +40,10 @@ export function ProductViewer() {
   const [configuration, setConfiguration] = useState<HelmetConfiguration>(FACTORY_CONFIGURATION)
   const [lighting, setLighting] = useState<LightingConfiguration>(DEFAULT_LIGHTING)
   const [selectedHotspot, setSelectedHotspot] = useState<HotspotId | null>(null)
+  const [impactFramed, setImpactFramed] = useState(false)
+  const impact = useImpactLab()
+  const impactActive = active === 4
+  const effectiveInspecting = inspecting && !impactActive
   const annotationOpen = active === 1 && selectedHotspot !== null
   const { scrollY } = useScroll()
   const progress = useMotionValue(0)
@@ -80,7 +86,11 @@ export function ProductViewer() {
       const position = Math.max(0, Math.min(4, index + (y - offsets[index]) / span))
       progress.set(position / 4)
       const next = Math.round(position)
-      if (next !== lastActive) { lastActive = next; setActive(next) }
+      if (next !== lastActive) {
+        lastActive = next
+        setActive(next)
+        if (next === 4) setInspecting(false)
+      }
     }
     function measure() {
       offsets = CHECKPOINTS.map(({ id }) => document.getElementById(id)!.getBoundingClientRect().top + window.scrollY)
@@ -109,9 +119,9 @@ export function ProductViewer() {
           {CHECKPOINTS.slice(1).map((checkpoint, index) => <a key={checkpoint.id} href={`#${checkpoint.id}`} aria-current={active === index + 1 ? 'location' : undefined} className="flex min-h-11 items-center border-b border-transparent text-xs text-steel hover:text-ivory aria-current:border-signal aria-current:text-ivory max-[380px]:text-[0.625rem]">{checkpoint.label}</a>)}
         </nav>
       </header>
-      <div data-lenis-prevent={inspecting ? true : undefined} className={`fixed inset-x-0 top-20 z-10 h-[44svh] min-[900px]:top-0 min-[900px]:h-svh ${annotationOpen ? "short-landscape:h-[calc(100svh_-_5rem)]" : ""}`} aria-label="Persistent helmet studio">
+      <div data-lenis-prevent={effectiveInspecting ? true : undefined} className={`fixed inset-x-0 top-20 z-10 h-[44svh] min-[900px]:top-0 min-[900px]:h-svh ${annotationOpen ? "short-landscape:h-[calc(100svh_-_5rem)]" : ""}`} aria-label="Persistent helmet studio">
         <ViewerBoundary><Suspense fallback={<ViewerFallback loading />}>
-          <SceneCanvas cameraRef={camera} inspecting={inspecting} progress={progress} onReady={setReady} configuration={configuration} lighting={lighting}
+          <SceneCanvas onImpactFramed={setImpactFramed} impactActive={impactActive} impactSettings={impact.settings} impactHandle={impact.handle} onImpactTelemetry={impact.setTelemetry} cameraRef={camera} inspecting={effectiveInspecting} progress={progress} onReady={setReady} configuration={configuration} lighting={lighting}
             showHotspots={active === 1} selectedHotspot={selectedHotspot} onHotspot={(id) => setSelectedHotspot((current) => current === id ? null : id)} onCloseNote={closeNote} />
         </Suspense></ViewerBoundary>
         <p className="pointer-events-none absolute top-4 right-page text-[0.625rem] tracking-[0.12em] text-steel min-[900px]:top-24">{ready ? 'F1 / ZHOU GUANYU 24' : 'PREPARING STUDIO'}</p>
@@ -148,11 +158,11 @@ export function ProductViewer() {
           </div>
         </section>
         <section id="impact" aria-labelledby="impact-title" className={sectionClass}>
-          <div className="w-full min-[900px]:w-[32%]">
+          <div className="pointer-events-auto w-full min-[900px]:w-[32%]">
             <h2 id="impact-title" className={headingClass}>From form<br />to force.</h2>
-            <p className="mt-6 max-w-[35ch] text-sm leading-relaxed text-steel">Impact Lab will introduce an illustrative study of gravity and collisions. Physical dimensions, colliders and simulation behavior will be established in Stage 5.</p>
-            <p className="mt-6 border-t border-line pt-4 text-xs text-signal">Impact Lab / Upcoming. Simulation is not available yet.</p>
-            <p className="mt-4 text-xs leading-relaxed text-steel">An independent university project. No safety-performance claims.</p>
+            <p className="mt-5 max-w-[35ch] text-sm leading-relaxed text-steel">Release the helmet. Observe gravity, rotation and contact on a rigid testing surface.</p>
+            <ImpactControls settings={impact.settings} telemetry={impact.telemetry} onSettings={impact.setSettings} onCommand={impact.command} available={ready && impactActive && impactFramed} />
+            <p className="mt-4 text-xs leading-relaxed text-steel">Illustrative rigid-body experiment. Assumed length 0.34 m / mass 1.5 kg. Simplified solid colliders; no deformation or safety certification.</p>
           </div>
         </section>
       </main>
@@ -160,8 +170,8 @@ export function ProductViewer() {
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
           <p className="text-[0.625rem] text-steel">{String(active + 1).padStart(2, '0')} / 05 <span className="ml-3">{CHECKPOINTS[active].label}</span></p>
           <div className="pointer-events-auto flex flex-wrap gap-1" role="group" aria-label="Camera controls">
-            <button type="button" className={buttonClass} disabled={!ready} aria-pressed={inspecting} onClick={() => setInspecting(!inspecting)}>{inspecting ? 'Return to cinematic' : 'Inspect'}</button>
-            {inspecting && <>
+            <button type="button" className={buttonClass} disabled={!ready || impactActive} aria-pressed={effectiveInspecting} onClick={() => setInspecting(!inspecting)}>{effectiveInspecting ? 'Return to cinematic' : 'Inspect'}</button>
+            {effectiveInspecting && <>
               <button type="button" className={buttonClass} aria-label="Rotate view left" onClick={() => camera.current?.rotate(-1)}><RotateCcw size={14} /></button>
               <button type="button" className={buttonClass} aria-label="Rotate view right" onClick={() => camera.current?.rotate(1)}><RotateCw size={14} /></button>
               <button type="button" className={buttonClass} aria-label="Zoom in" onClick={() => camera.current?.zoom(true)}><Plus size={14} /></button>
@@ -170,7 +180,7 @@ export function ProductViewer() {
               {(['front', 'side', 'rear', 'threeQuarter'] as const).map((view) => <button type="button" key={view} className={buttonClass} onClick={() => camera.current?.view(view)}>{view === 'threeQuarter' ? '¾' : view[0].toUpperCase() + view.slice(1)}</button>)}
             </>}
           </div>
-          <p className="w-full text-[0.625rem] text-steel" aria-live="polite">{inspecting ? 'Inspect mode · Drag to orbit · Pinch or scroll to zoom · Return to cinematic to release the scene.' : 'Cinematic mode · Scroll to move through the study.'}</p>
+          <p className="w-full text-[0.625rem] text-steel" aria-live="polite">{impactActive ? 'Impact Lab � Scroll away to reset and return to the cinematic study.' : effectiveInspecting ? 'Inspect mode · Drag to orbit · Pinch or scroll to zoom · Return to cinematic to release the scene.' : 'Cinematic mode · Scroll to move through the study.'}</p>
           <a href="/models/NOTICE.txt" target="_blank" rel="noreferrer" className="pointer-events-auto text-[0.625rem] text-steel">F1 Helmet ZhouGuanyu 24 · Miopass · CC BY 4.0 / Asset credit</a>
         </div>
       </div>

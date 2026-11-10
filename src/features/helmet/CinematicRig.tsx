@@ -1,22 +1,26 @@
-import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import type { RapierRigidBody } from '@react-three/rapier'
+import { DISPLAY_UNITS_PER_METER, HELMET_METERS_PER_UNIT } from './impactSimulation'
+import { useLayoutEffect, useRef, type ReactNode, type RefObject } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import type { MotionValue } from 'motion/react'
 import { Euler, Group, MathUtils, Matrix4, PerspectiveCamera, Quaternion, Vector3 } from 'three'
 import { HELMET_CENTER_Y, sampleChoreography, type ChoreographyPose } from './scrollChoreography'
 import { useReducedMotion } from './useReducedMotion'
 
-type CinematicRigProps = { progress: MotionValue<number>; inspecting: boolean; noteOpen: boolean; children: ReactNode }
+type CinematicRigProps = { onImpactFramed: (framed: boolean) => void; impactActive: boolean; impactHeight: number; bodyRef: RefObject<RapierRigidBody | null>; progress: MotionValue<number>; inspecting: boolean; noteOpen: boolean; children: ReactNode }
 const TARGET = new Vector3(0, HELMET_CENTER_Y, 0)
 const DIRECTION = new Vector3(4, 2.4, -5).normalize()
 const RIGHT = new Vector3().crossVectors(DIRECTION, new Vector3(0, 1, 0)).normalize()
 const UP = new Vector3().crossVectors(RIGHT, DIRECTION).normalize()
 
-export function CinematicRig({ progress, inspecting, noteOpen, children }: CinematicRigProps) {
+export function CinematicRig({ onImpactFramed, impactActive, impactHeight, bodyRef, progress, inspecting, noteOpen, children }: CinematicRigProps) {
   const group = useRef<Group>(null)
   const { camera, size, invalidate } = useThree()
   const reduced = useReducedMotion()
   const returning = useRef(false)
-  const previous = useRef({ inspecting, noteOpen })
+  const framingComplete = useRef(false)
+  const previous = useRef({ inspecting, noteOpen, impactActive, impactHeight })
+  const target = useRef(new Vector3())
   const goal = useRef(new Vector3())
   const positionGoal = useRef(new Vector3())
   const rotationGoal = useRef(new Quaternion())
@@ -28,15 +32,17 @@ export function CinematicRig({ progress, inspecting, noteOpen, children }: Cinem
 
   useLayoutEffect(() => progress.on('change', () => { if (!inspecting) invalidate() }), [progress, inspecting, invalidate])
   useLayoutEffect(() => {
-    returning.current = !inspecting && (previous.current.inspecting || previous.current.noteOpen !== noteOpen)
+    returning.current = !inspecting && (previous.current.inspecting || previous.current.noteOpen !== noteOpen || previous.current.impactActive !== impactActive || (impactActive && previous.current.impactHeight !== impactHeight))
     if (!inspecting && previous.current.inspecting) {
       // Inspect clears the projection offset; blend back from that actual projection.
       current.current.framing = 0
       current.current.verticalFraming = 0
     }
-    previous.current = { inspecting, noteOpen }
+    previous.current = { inspecting, noteOpen, impactActive, impactHeight }
+    framingComplete.current = false
+    onImpactFramed(false)
     invalidate()
-  }, [inspecting, noteOpen, reduced, size.width, size.height, invalidate])
+  }, [inspecting, noteOpen, impactActive, impactHeight, reduced, size.width, size.height, invalidate, onImpactFramed])
 
   useFrame((_, delta) => {
     if (inspecting || !group.current || !(camera instanceof PerspectiveCamera)) return
@@ -49,20 +55,34 @@ export function CinematicRig({ progress, inspecting, noteOpen, children }: Cinem
     // Reserve space for the fixed desktop header and camera toolbar on short screens.
     const availableHeight = compact ? 0.9 : Math.max(0.35, 1 - 240 / size.height)
     const tightFov = Math.atan(Math.tan(halfFov) * Math.min(availableHeight, availableAspect))
-    const distance = (compact ? 1.22 : 1.15) / Math.sin(tightFov) * pose.distance
+    let distance = (compact ? 1.22 : 1.15) / Math.sin(tightFov) * pose.distance
     goal.current.copy(TARGET).addScaledVector(DIRECTION, distance)
     positionGoal.current.copy(TARGET).addScaledVector(RIGHT, pose.x).addScaledVector(UP, pose.y)
     rotationGoal.current.setFromEuler(rotation.current.set(pose.pitch, pose.yaw, pose.roll))
-    const scale = compact && noteOpen ? 0.58 : pose.scale
-    const blend = returning.current && !reduced ? 1 - Math.exp(-Math.min(delta, 0.05) * 9) : 1
+    let scale = compact && noteOpen ? 0.58 : pose.scale
+    if (impactActive && bodyRef.current) {
+      // Only read the meter-space body. Rapier is the sole writer of its transform.
+      const position = bodyRef.current.translation()
+      const orientation = bodyRef.current.rotation()
+      positionGoal.current.set(position.x, position.y, position.z).multiplyScalar(DISPLAY_UNITS_PER_METER)
+      rotationGoal.current.set(orientation.x, orientation.y, orientation.z, orientation.w)
+      scale = HELMET_METERS_PER_UNIT * DISPLAY_UNITS_PER_METER
+      const labCenter = (impactHeight + 0.3) * DISPLAY_UNITS_PER_METER / 2
+      distance = Math.max(3.2, (impactHeight + 0.45) * DISPLAY_UNITS_PER_METER / 2) / Math.sin(tightFov)
+      target.current.set(positionGoal.current.x, labCenter, positionGoal.current.z)
+      goal.current.copy(target.current).addScaledVector(DIRECTION, distance)
+      pose.framing = compact ? 0 : -0.22
+    }
+    const blend = (returning.current || impactActive) && !reduced ? 1 - Math.exp(-Math.min(delta, 0.05) * 9) : 1
     camera.position.lerp(goal.current, blend)
-    group.current.position.lerp(positionGoal.current, blend)
-    group.current.quaternion.slerp(rotationGoal.current, blend)
-    group.current.scale.setScalar(MathUtils.lerp(group.current.scale.x, scale, blend))
+    const presentationBlend = impactActive && !returning.current ? 1 : blend
+    group.current.position.lerp(positionGoal.current, presentationBlend)
+    group.current.quaternion.slerp(rotationGoal.current, presentationBlend)
+    group.current.scale.setScalar(MathUtils.lerp(group.current.scale.x, scale, presentationBlend))
     current.current.framing = MathUtils.lerp(current.current.framing, pose.framing, blend)
     const verticalFraming = compact && noteOpen ? 0.25 : 0
     current.current.verticalFraming = MathUtils.lerp(current.current.verticalFraming, verticalFraming, blend)
-    cameraRotationGoal.current.setFromRotationMatrix(lookAtMatrix.current.lookAt(goal.current, TARGET, camera.up))
+    cameraRotationGoal.current.setFromRotationMatrix(lookAtMatrix.current.lookAt(goal.current, impactActive ? target.current : TARGET, camera.up))
     camera.quaternion.slerp(cameraRotationGoal.current, blend)
     camera.setViewOffset(size.width, size.height, current.current.framing * size.width, current.current.verticalFraming * size.height, size.width, size.height)
     if (returning.current) {
@@ -75,6 +95,13 @@ export function CinematicRig({ progress, inspecting, noteOpen, children }: Cinem
         && Math.abs(current.current.verticalFraming - verticalFraming) < 0.0001
       if (settled) returning.current = false
       else invalidate()
+    }
+    const labCameraSettled = camera.position.distanceToSquared(goal.current) < 0.00001
+      && camera.quaternion.angleTo(cameraRotationGoal.current) < 0.0001
+    if (impactActive && !labCameraSettled) invalidate()
+    if (impactActive && labCameraSettled && !returning.current && !framingComplete.current && bodyRef.current) {
+      framingComplete.current = true
+      onImpactFramed(true)
     }
   }, -0.5)
 
