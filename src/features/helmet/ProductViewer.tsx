@@ -1,4 +1,5 @@
-import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Component, lazy, Suspense, useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
+import { useLenis } from 'lenis/react'
 import { ArrowDown, Minus, Plus, RotateCcw, RotateCw } from 'lucide-react'
 import { motion, useMotionValue, useScroll, useTransform } from 'motion/react'
 import type { ViewerCameraHandle } from './SceneCamera'
@@ -41,7 +42,31 @@ export function ProductViewer() {
   const { scrollY } = useScroll()
   const progress = useMotionValue(0)
   const reduced = useReducedMotion()
+  const lenis = useLenis()
   const heroOpacity = useTransform(progress, [0, 0.18], [1, 0])
+
+  useEffect(() => {
+    if (inspecting) lenis?.scrollTo(window.scrollY, { immediate: true })
+  }, [inspecting, lenis])
+
+  function navigateToSection(event: MouseEvent<HTMLDivElement>) {
+    if (!lenis || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    if (!(event.target instanceof Element)) return
+    const link = event.target.closest<HTMLAnchorElement>('a[href^="#"]')
+    if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return
+    const hash = link.getAttribute('href')
+    if (!hash || hash === '#') return
+    const target = document.getElementById(decodeURIComponent(hash.slice(1)))
+    if (!target) return
+
+    event.preventDefault()
+    if (window.location.hash !== hash) window.history.pushState(null, '', hash)
+    lenis.scrollTo(target, {
+      onComplete: () => {
+        if (target.id === 'main') target.focus({ preventScroll: true })
+      },
+    })
+  }
 
   useEffect(() => {
     const root = narrative.current
@@ -75,7 +100,7 @@ export function ProductViewer() {
   }
 
   return (
-    <div id="top" className="bg-surface">
+    <div id="top" className="bg-surface" onClick={navigateToSection}>
       <a href="#main" className="fixed top-4 left-page z-[80] -translate-y-[200%] bg-ivory p-3 text-graphite focus:translate-y-0">Skip to content</a>
       <header className="fixed inset-x-0 top-0 z-[60] flex min-h-20 items-center justify-between gap-3 border-b border-line bg-surface px-page max-[380px]:px-3">
         <a href="#intro" aria-label="APEX / 01 home" className="shrink-0 whitespace-nowrap font-display text-2xl font-semibold tracking-[-0.035em]">APEX <span className="text-steel">/ 01</span></a>
@@ -84,7 +109,7 @@ export function ProductViewer() {
           {CHECKPOINTS.slice(1).map((checkpoint, index) => <a key={checkpoint.id} href={`#${checkpoint.id}`} aria-current={active === index + 1 ? 'location' : undefined} className="flex min-h-11 items-center border-b border-transparent text-xs text-steel hover:text-ivory aria-current:border-signal aria-current:text-ivory max-[380px]:text-[0.625rem]">{checkpoint.label}</a>)}
         </nav>
       </header>
-      <div className={`fixed inset-x-0 top-20 z-10 h-[44svh] min-[900px]:top-0 min-[900px]:h-svh ${annotationOpen ? "short-landscape:h-[calc(100svh_-_5rem)]" : ""}`} aria-label="Persistent helmet studio">
+      <div data-lenis-prevent={inspecting ? true : undefined} className={`fixed inset-x-0 top-20 z-10 h-[44svh] min-[900px]:top-0 min-[900px]:h-svh ${annotationOpen ? "short-landscape:h-[calc(100svh_-_5rem)]" : ""}`} aria-label="Persistent helmet studio">
         <ViewerBoundary><Suspense fallback={<ViewerFallback loading />}>
           <SceneCanvas cameraRef={camera} inspecting={inspecting} progress={progress} onReady={setReady} configuration={configuration} lighting={lighting}
             showHotspots={active === 1} selectedHotspot={selectedHotspot} onHotspot={(id) => setSelectedHotspot((current) => current === id ? null : id)} onCloseNote={closeNote} />

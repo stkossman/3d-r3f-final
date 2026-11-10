@@ -33,7 +33,4 @@ a:hover { color: var(--color-signal); }
 ::selection { background: var(--color-signal); color: var(--color-graphite); }
 h1, h2, h3, p, figure { margin: 0; }
 svg { flex-shrink: 0; }
-@media (prefers-reduced-motion: no-preference) {
-  html { scroll-behavior: smooth; }
-}
 }
