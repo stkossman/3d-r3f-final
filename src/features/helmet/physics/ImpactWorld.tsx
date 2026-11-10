@@ -3,7 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { CuboidCollider, RigidBody, useRapier, type RapierRigidBody } from '@react-three/rapier'
 import { Euler, Quaternion, type MeshStandardMaterial } from 'three'
 import { DISPLAY_UNITS_PER_METER, HELMET_COLLIDERS, IMPACT_DAMPING, IMPACT_FRICTION, PLATFORM_HALF_EXTENTS, RELEASE_ROTATION, PHYSICS_STEP, type ImpactHandle, type ImpactSettings, type ImpactStatus, type ImpactTelemetry } from './impactSimulation'
-import { useReducedMotion } from './useReducedMotion'
+import { useReducedMotion } from '../animation/useReducedMotion'
 
 type ImpactWorldProps = {
   active: boolean

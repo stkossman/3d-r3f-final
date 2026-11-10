@@ -1,4 +1,4 @@
-import { FACTORY_CONFIGURATION, MATERIAL_PRESETS, type HelmetConfiguration } from './helmetConfiguration'
+import { FACTORY_CONFIGURATION, MATERIAL_PRESETS, type HelmetConfiguration } from '../model/helmetConfiguration'
 
 type DesignControlsProps = {
   configuration: HelmetConfiguration

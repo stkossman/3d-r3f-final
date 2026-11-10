@@ -4,7 +4,7 @@ import { Html } from '@react-three/drei/web/Html'
 import { Group, Vector3 } from 'three'
 import { X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useReducedMotion } from './useReducedMotion'
+import { useReducedMotion } from '../animation/useReducedMotion'
 import { HELMET_HOTSPOTS, type HotspotId } from './helmetConfiguration'
 
 type HelmetNotesProps = {

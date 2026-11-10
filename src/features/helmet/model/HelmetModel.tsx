@@ -6,7 +6,7 @@ import { HelmetNotes } from './HelmetNotes'
 import { Box3, Group, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, SRGBColorSpace, Vector3, type Texture } from 'three'
 import { createHelmetMaterial, HELMET_PARTS } from './helmetMaterials'
 import { SHELL_COLORS, VISOR_COLORS, type HelmetConfiguration, type HotspotId } from './helmetConfiguration'
-import { useDiagnosticScan, type DiagnosticScanProps } from './useDiagnosticScan'
+import { useDiagnosticScan, type DiagnosticScanProps } from '../shaders/useDiagnosticScan'
 
 type HelmetModelProps = DiagnosticScanProps & {
   configuration: HelmetConfiguration

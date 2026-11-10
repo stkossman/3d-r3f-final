@@ -3,8 +3,8 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei/core/OrbitControls'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { MathUtils, PerspectiveCamera, Spherical, Vector3 } from 'three'
-import { useReducedMotion } from './useReducedMotion'
-import { HELMET_CENTER_Y } from './scrollChoreography'
+import { useReducedMotion } from '../animation/useReducedMotion'
+import { HELMET_CENTER_Y } from '../animation/scrollChoreography'
 
 export type CameraView = 'front' | 'side' | 'rear' | 'threeQuarter'
 

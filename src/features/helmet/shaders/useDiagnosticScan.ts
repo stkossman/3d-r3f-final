@@ -1,10 +1,10 @@
 import { useLayoutEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Color, Matrix4, Mesh, MeshStandardMaterial, Uniform, type Group, type Object3D } from 'three'
-import scanVertex from './shaders/diagnostic.vert.glsl'
-import scanFragment from './shaders/diagnostic.frag.glsl'
-import { HELMET_PARTS } from './helmetMaterials'
-import { useReducedMotion } from './useReducedMotion'
+import scanVertex from './diagnostic.vert.glsl'
+import scanFragment from './diagnostic.frag.glsl'
+import { HELMET_PARTS } from '../model/helmetMaterials'
+import { useReducedMotion } from '../animation/useReducedMotion'
 
 export type ScanStatus = 'ready' | 'scanning' | 'unavailable'
 export type DiagnosticScanProps = {

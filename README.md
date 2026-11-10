@@ -54,6 +54,8 @@ React 19, strict TypeScript, Vite 7, Tailwind CSS 4, Three r187, Fiber 9 and Dre
 
 Stage 4.5 A/B/C passed typecheck, lint, build and whitespace gates. Isolated Chromium checks covered annotations, reverse scroll interpolation, Inspect ownership/return, anchors/refresh, configuration/lighting persistence, keyboard operation, reduced motion and loading/error/context-loss paths. All requested widths (320/375/768/1024/1440/1920px) were checked for overflow and captured. A settled 700ms sample added zero WebGL frames; the same helmet/material/Canvas survived navigation with one GLB request. Physical-device frame rate/GPU memory and other browser engines remain unverified. Known advisories: a large lazy scene chunk and upstream THREE.Clock deprecation. No deployment has been performed.
 
+The helmet feature has a single `ProductViewer.tsx` entry point, with shallow `animation`, `camera`, `controls`, `loading`, `model`, `physics`, `scene` and `shaders` folders. See the architecture document for module ownership.
+
 - [Architecture and verification limits](docs/architecture.md)
 - [Asset evidence, optimization and licensing](docs/asset-review.md)
 - [Custom shader explanation for the defense](docs/shader-study.md)

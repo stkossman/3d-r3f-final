@@ -1,35 +1,23 @@
-import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
+import { ViewerBoundary } from './loading/ViewerBoundary'
+import { ViewerFallback } from './loading/ViewerFallback'
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
 import { useLenis } from 'lenis/react'
 import { ArrowDown, Minus, Plus, RotateCcw, RotateCw } from 'lucide-react'
 import { motion, useMotionValue, useScroll, useTransform } from 'motion/react'
-import type { ViewerCameraHandle } from './SceneCamera'
-import { LightingControls } from './LightingControls'
-import { DEFAULT_LIGHTING, type LightingConfiguration } from './studioLighting'
-import { DesignControls } from './DesignControls'
-import { FACTORY_CONFIGURATION, type HelmetConfiguration, type HotspotId } from './helmetConfiguration'
-import { ImpactControls } from './ImpactControls'
-import { useImpactLab } from './impactSimulation'
-import { CinematicPreloader } from './CinematicPreloader'
-import type { SceneLoadState } from './sceneLoading'
-import type { ScanStatus } from './useDiagnosticScan'
-import { CHECKPOINTS } from './scrollChoreography'
-import { useReducedMotion } from './useReducedMotion'
+import type { ViewerCameraHandle } from './camera/SceneCamera'
+import { LightingControls } from './controls/LightingControls'
+import { DEFAULT_LIGHTING, type LightingConfiguration } from './scene/studioLighting'
+import { DesignControls } from './controls/DesignControls'
+import { FACTORY_CONFIGURATION, type HelmetConfiguration, type HotspotId } from './model/helmetConfiguration'
+import { ImpactControls } from './controls/ImpactControls'
+import { useImpactLab } from './physics/impactSimulation'
+import { CinematicPreloader } from './loading/CinematicPreloader'
+import type { SceneLoadState } from './loading/sceneLoading'
+import type { ScanStatus } from './shaders/useDiagnosticScan'
+import { CHECKPOINTS } from './animation/scrollChoreography'
+import { useReducedMotion } from './animation/useReducedMotion'
 
-const SceneCanvas = lazy(() => import('./SceneCanvas'))
-
-export function ViewerFallback({ loading = false }: { loading?: boolean }) {
-  return <div className="grid h-full min-h-60 place-content-center gap-3 px-8 text-center" role="status">
-    <p className="text-sm text-ivory">{loading ? 'Preparing the product study…' : 'The 3D study is unavailable.'}</p>
-    <p className="max-w-[32ch] text-xs leading-relaxed text-steel">{loading ? 'Loading the helmet and studio.' : 'Reload to retry the model. Check your connection and WebGL support. You can still read the experience below.'}</p>
-  </div>
-}
-
-class ViewerBoundary extends Component<{ children: ReactNode; onUnavailable: () => void }, { failed: boolean }> {
-  state = { failed: false }
-  static getDerivedStateFromError() { return { failed: true } }
-  componentDidCatch() { this.props.onUnavailable() }
-  render() { return this.state.failed ? <ViewerFallback /> : this.props.children }
-}
+const SceneCanvas = lazy(() => import('./scene/SceneCanvas'))
 
 const buttonClass = 'flex min-h-11 min-w-11 cursor-pointer items-center justify-center border border-line bg-graphite px-3 text-xs text-ivory hover:border-steel hover:text-signal disabled:opacity-40'
 const sectionClass = 'flex min-h-svh items-center px-page pt-[56svh] pb-40 min-[900px]:pt-24'

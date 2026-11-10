@@ -6,9 +6,9 @@ The implementation extends the existing shell PBR shader through `onBeforeCompil
 
 ## GPU stages and coordinate space
 
-`diagnostic.vert.glsl` multiplies shell-local vertices by `uScanToHelmet`. This matrix composes the actual exporter hierarchy and measured alignment transforms, stopping before the cinematic/physics presentation parents. The resulting varying is in normalized helmet coordinates: bottom near Y=0.345, top near 1.734, longest axis 1.85. The scan therefore follows the helmet when it rotates, rather than remaining fixed in world space.
+`src/features/helmet/shaders/diagnostic.vert.glsl` multiplies shell-local vertices by `uScanToHelmet`. This matrix composes the actual exporter hierarchy and measured alignment transforms, stopping before the cinematic/physics presentation parents. The resulting varying is in normalized helmet coordinates: bottom near Y=0.345, top near 1.734, longest axis 1.85. The scan therefore follows the helmet when it rotates, rather than remaining fixed in world space.
 
-`diagnostic.frag.glsl` moves a horizontal field from Y=0.25 to 1.85. Each fragment compares its interpolated height with that field. Two bounded smoothstep functions form a narrow core and restrained shoulder. A fract/step pattern adds fine graduations along X+Z, with a small time-dependent drift. The band is added to linear `outgoingLight` immediately before Three's opaque output, so the existing tone mapping and output color conversion each run once. There is no vertex displacement, so geometry bounds, raycasting and shadow depth remain valid.
+`src/features/helmet/shaders/diagnostic.frag.glsl` moves a horizontal field from Y=0.25 to 1.85. Each fragment compares its interpolated height with that field. Two bounded smoothstep functions form a narrow core and restrained shoulder. A fract/step pattern adds fine graduations along X+Z, with a small time-dependent drift. The band is added to linear `outgoingLight` immediately before Three's opaque output, so the existing tone mapping and output color conversion each run once. There is no vertex displacement, so geometry bounds, raycasting and shadow depth remain valid.
 
 | Uniform | Purpose |
 | --- | --- |

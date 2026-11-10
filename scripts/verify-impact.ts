@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import RAPIER from '@dimforge/rapier3d-compat'
 import { Euler, Quaternion } from 'three'
-import { HELMET_COLLIDERS, IMPACT_DAMPING, IMPACT_FRICTION, PLATFORM_HALF_EXTENTS, PHYSICS_STEP, RELEASE_ROTATION } from '../src/features/helmet/impactSimulation'
+import { HELMET_COLLIDERS, IMPACT_DAMPING, IMPACT_FRICTION, PLATFORM_HALF_EXTENTS, PHYSICS_STEP, RELEASE_ROTATION } from '../src/features/helmet/physics/impactSimulation'
 
 await RAPIER.init()
 let cases = 0

@@ -1,5 +1,5 @@
 import type { RapierRigidBody } from '@react-three/rapier'
-import { DISPLAY_UNITS_PER_METER, HELMET_METERS_PER_UNIT } from './impactSimulation'
+import { DISPLAY_UNITS_PER_METER, HELMET_METERS_PER_UNIT } from '../physics/impactSimulation'
 import { useLayoutEffect, useRef, type ReactNode, type RefObject } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import type { MotionValue } from 'motion/react'

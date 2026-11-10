@@ -2,19 +2,22 @@
 
 ## Modules and boundaries
 
-| Module | Responsibility |
+All experience code stays inside `src/features/helmet/`, grouped one level deep by responsibility. `ProductViewer.tsx` is the feature entry point and composition/state owner.
+
+| Location | Responsibility and modules |
 | --- | --- |
-| App / ProductViewer | Semantic five-checkpoint narrative, fixed header/anchors, local configuration/lighting/annotation/Inspect state, lazy scene and fallbacks |
-| scrollChoreography / CinematicRig | Typed checkpoint poses, allocation-free sampling, presentation-group transforms and cinematic camera ownership |
-| DesignControls / LightingControls / configuration data | Typed material/light choices, curated presets, verified descriptions and measured display-space anchors |
-| SceneCanvas | Single Canvas, renderer settings and context-loss handling |
-| SceneCamera | Responsive framing, OrbitControls, interruptible camera transitions and typed ref bridge |
-| HelmetModel / helmetMaterials | GLB loading, normalization, owned material instances and source part mapping |
-| HelmetNotes | Occlusion-aware HTML markers and a projected/clamped HTML note card |
-| ProductStage | Studio lighting and static reflection environment |
-| ImpactWorld / impactSimulation / ImpactControls | Meter-space Rapier world, compound helmet body, local lifecycle/telemetry and accessible lab controls |
-| useReducedMotion | Live media-query subscription |
-| scripts/prepare-helmet.mjs | Offline optimization, texture validation and hash/structure report |
+| `ProductViewer.tsx` | Semantic narrative, anchors, local state and composition of the lazy scene and controls |
+| `animation/` | `CinematicRig`, `scrollChoreography`, `SmoothScroll`, `useReducedMotion`: presentation choreography, native-scroll integration and motion preferences |
+| `camera/` | `SceneCamera`: responsive framing, OrbitControls, camera transitions and its typed ref contract |
+| `controls/` | `DesignControls`, `LightingControls`, `ImpactControls`: accessible HTML inputs using their owning modules' configuration/types |
+| `loading/` | `CinematicPreloader`, `SceneReadiness`, `sceneLoading`, `ViewerBoundary`, `ViewerFallback`: initial reveal, readiness, loading state and error/fallback UI |
+| `model/` | `HelmetModel`, `HelmetNotes`, `helmetMaterials`, `helmetConfiguration`: GLB ownership, PBR materials, customization data and annotations |
+| `physics/` | `ImpactWorld`, `impactSimulation`: meter-space Rapier world, colliders, lifecycle, local state and telemetry |
+| `scene/` | `SceneCanvas`, `ProductStage`, `studioLighting`: persistent renderer, studio lighting, reflections and lighting configuration |
+| `shaders/` | `useDiagnosticScan`, `diagnostic.vert.glsl`, `diagnostic.frag.glsl`: scan lifecycle, uniforms and GLSL source |
+| `scripts/prepare-helmet.mjs` | Offline optimization, texture validation and hash/structure report |
+
+Imports reference concrete modules directly; no barrels, new state layers or generic wrappers are introduced. Data, types and hooks remain with the responsibility that owns them. DOM controls/fallbacks stay separate from Canvas descendants. SceneCanvas imports fallback UI from `loading/`, rather than depending back on ProductViewer. The component hierarchy, one-Canvas/model ownership and lazy scene boundary remain unchanged.
 
 Relative imports, strict TypeScript and existing ESLint rules remain. Motion is the existing animation dependency. No global store, backend, new runtime dependency or testing framework was added. The optimizer packages are development-only. Stage 5 uses the installed Rapier wrapper; Stage 6 extends the owned shell PBR shader; postprocessing remains omitted.
 

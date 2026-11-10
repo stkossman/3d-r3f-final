@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { ImpactAction, ImpactSettings, ImpactTelemetry } from './impactSimulation'
+import type { ImpactAction, ImpactSettings, ImpactTelemetry } from '../physics/impactSimulation'
 
 const buttonClass = 'min-h-11 cursor-pointer border border-line px-3 text-xs text-ivory hover:border-steel hover:text-signal disabled:cursor-default disabled:opacity-40'
 

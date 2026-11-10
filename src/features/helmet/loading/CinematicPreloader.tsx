@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { motion } from 'motion/react'
 import { useProgress } from '@react-three/drei/core/Progress'
-import { useReducedMotion } from './useReducedMotion'
+import { useReducedMotion } from '../animation/useReducedMotion'
 import type { SceneLoadState } from './sceneLoading'
 
 type CinematicPreloaderProps = {

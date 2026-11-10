@@ -1,4 +1,4 @@
-import { DEFAULT_LIGHTING, LIGHTING_PRESETS, type LightingConfiguration } from './studioLighting'
+import { DEFAULT_LIGHTING, LIGHTING_PRESETS, type LightingConfiguration } from '../scene/studioLighting'
 
 type LightingControlsProps = {
   configuration: LightingConfiguration
