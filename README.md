@@ -2,7 +2,7 @@
 
 **Interactive Motorsport Helmet Experience** · Engineered for the edge.
 
-A university final project featuring a real F1 helmet, studio materials and two functional modes: Explore and Design. Stages 0–4 are implemented; Impact Lab begins in Stage 5.
+A university final project featuring a real F1 helmet in a continuous, native-scroll product narrative. Stages 0–4.5 are implemented; Impact Lab begins in Stage 5.
 
 ## Run locally
 
@@ -21,11 +21,13 @@ Preview serves the local production build; it does not deploy. Preserve bun.lock
 
 ## Experience
 
-- **Explore:** rotate, bounded zoom, accessible camera buttons, smooth front/side/rear/three-quarter views, reset and three anchored component notes with DOM equivalents.
-- **Design:** Factory/Stealth/Apex presets; original/ivory/graphite/signal shell tones; gloss/satin finish; smoke/silver/copper visor-and-trim tints. Actual instance-owned PBR materials change, choices persist between modes, and Restore factory recovers the original livery.
-- **Impact Lab:** explicitly upcoming. No physics, custom shaders or postprocessing are implemented.
+- **Introduction:** a five-checkpoint narrative begins with a three-quarter reveal. Native anchors support navigation, history and refresh.
+- **Explore:** three keyboard-accessible numbered markers open component notes inside the viewer. Notes follow projected anchors, clamp to the viewport, and close with the marker, close button or Escape. Dashed markers indicate occluded anchors while remaining accessible.
+- **Design:** existing Factory/Stealth/Apex presets, shell tones, finishes and visor-and-trim tints modify owned PBR materials. Restore factory recovers the original livery.
+- **Lighting:** Studio/Contrast/Warm presets, a 0.65–1.35× key-light control and Reset lighting change actual lights. Material and lighting choices persist across checkpoints.
+- **Impact Lab:** an explicitly upcoming preview. No physics, custom shaders or postprocessing are implemented.
 
-Touch inspection is opt-in to preserve page scrolling. Camera motion respects reduced motion, cancels on input and stops rendering when settled. Loading, model errors and WebGL/context-loss fallbacks preserve the page and disable unavailable scene controls.
+Cinematic mode leaves wheel and touch input to the document. Explicit **Inspect** enables orbit, bounded zoom, camera presets and reset; **Return to cinematic** blends back to the current scroll composition. One Canvas/model remains mounted. Mobile uses centered framing and controls below the scene; opening a note makes room for its card. Reduced motion removes cinematic rotation and uses immediate composition changes. Loading, model errors and WebGL/context-loss fallbacks preserve the page and disable unavailable controls.
 
 The source glass mesh also contains fixed crown inserts and lower trim. Opening it would move those parts incorrectly; articulation is unavailable until geometry separation. No safety/manufacturing specifications are inferred from the model.
 
@@ -45,9 +47,9 @@ The script requires assets/candidates/f1-zhou/f1_helmet_zhouguanyu_24.glb, prese
 
 ## Engineering and verification
 
-React 19, strict TypeScript, Vite 7, Tailwind CSS 4, Three r187, Fiber 9 and Drei 10. One lazy demand-rendered Canvas, explicit ownership, local configuration state and Tailwind-first DOM styling preserve the Industrial Editorial identity. No new browser runtime dependencies were needed.
+React 19, strict TypeScript, Vite 7, Tailwind CSS 4, Three r187, Fiber 9 and Drei 10. One lazy demand-rendered Canvas, explicit ownership, local configuration state, Motion scroll values and Tailwind-first DOM styling preserve the Industrial Editorial identity. No new browser runtime dependencies were needed.
 
-Per-stage gates and Chromium checks passed; responsive widths from 320–1920px, material choices, camera actions, notes, reduced motion and failures were exercised. Physical-device frame rate/GPU memory and other browser engines remain unverified. Known advisories: a large lazy scene chunk and upstream THREE.Clock deprecation. No deployment has been performed.
+Stage 4.5 A/B/C passed typecheck, lint, build and whitespace gates. Isolated Chromium checks covered annotations, reverse scroll interpolation, Inspect ownership/return, anchors/refresh, configuration/lighting persistence, keyboard operation, reduced motion and loading/error/context-loss paths. All requested widths (320/375/768/1024/1440/1920px) were checked for overflow and captured. A settled 700ms sample added zero WebGL frames; the same helmet/material/Canvas survived navigation with one GLB request. Physical-device frame rate/GPU memory and other browser engines remain unverified. Known advisories: a large lazy scene chunk and upstream THREE.Clock deprecation. No deployment has been performed.
 
 - [Architecture and verification limits](docs/architecture.md)
 - [Asset evidence, optimization and licensing](docs/asset-review.md)

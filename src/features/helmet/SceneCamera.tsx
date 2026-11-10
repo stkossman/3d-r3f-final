@@ -24,9 +24,8 @@ const VIEW_DIRECTIONS = {
   threeQuarter: HOME_DIRECTION,
 }
 
-export function SceneCamera({ ref }: { ref: Ref<ViewerCameraHandle> }) {
+export function SceneCamera({ ref, enabled = true }: { ref: Ref<ViewerCameraHandle>; enabled?: boolean }) {
   const controls = useRef<OrbitControlsImpl>(null)
-  const previousMinimum = useRef(0)
   const camera = useThree((state) => state.camera)
   const size = useThree((state) => state.size)
   const invalidate = useThree((state) => state.invalidate)
@@ -61,7 +60,7 @@ export function SceneCamera({ ref }: { ref: Ref<ViewerCameraHandle> }) {
   useFrame((_, delta) => {
     const motion = transition.current
     const orbit = controls.current
-    if (!motion.active || !orbit) return
+    if (!enabled || !motion.active || !orbit) return
     motion.elapsed += Math.min(delta, 0.05)
     const progress = Math.min(motion.elapsed / 0.65, 1)
     const amount = 1 - Math.pow(1 - progress, 3)
@@ -78,7 +77,7 @@ export function SceneCamera({ ref }: { ref: Ref<ViewerCameraHandle> }) {
 
   useLayoutEffect(() => {
     const orbit = controls.current
-    if (!orbit || !(camera instanceof PerspectiveCamera)) return
+    if (!enabled || !orbit || !(camera instanceof PerspectiveCamera)) return
     transition.current.active = false
     orbit.enableDamping = false
     orbit.update()
@@ -87,8 +86,8 @@ export function SceneCamera({ ref }: { ref: Ref<ViewerCameraHandle> }) {
     const verticalHalfFov = MathUtils.degToRad(camera.fov / 2)
     const horizontalHalfFov = Math.atan(Math.tan(verticalHalfFov) * size.width / size.height)
     const minimum = DISPLAY_RADIUS / Math.sin(Math.min(verticalHalfFov, horizontalHalfFov))
-    const zoomRatio = previousMinimum.current ? orbit.getDistance() / previousMinimum.current : 1.12
-    const direction = previousMinimum.current ? camera.position.clone().sub(TARGET).normalize() : HOME_DIRECTION
+    const zoomRatio = orbit.getDistance() / minimum
+    const direction = camera.position.clone().sub(TARGET).normalize()
     orbit.minDistance = minimum
     orbit.maxDistance = minimum * 1.65
     orbit.target.copy(TARGET)
@@ -97,9 +96,8 @@ export function SceneCamera({ ref }: { ref: Ref<ViewerCameraHandle> }) {
     orbit.target0.copy(TARGET)
     orbit.update()
     orbit.enableDamping = true
-    previousMinimum.current = minimum
     invalidate()
-  }, [camera, size.width, size.height, invalidate])
+  }, [camera, size.width, size.height, invalidate, enabled])
 
   useImperativeHandle(ref, () => ({
     reset: () => {
@@ -128,5 +126,5 @@ export function SceneCamera({ ref }: { ref: Ref<ViewerCameraHandle> }) {
     },
   }))
 
-  return <OrbitControls ref={controls} makeDefault onStart={cancelTransition} enablePan={false} enableDamping dampingFactor={0.12} rotateSpeed={0.55} zoomSpeed={0.6} minPolarAngle={Math.PI / 8} maxPolarAngle={Math.PI / 2.25} />
+  return <OrbitControls ref={controls} enabled={enabled} makeDefault onStart={cancelTransition} enablePan={false} enableDamping dampingFactor={0.12} rotateSpeed={0.55} zoomSpeed={0.6} minPolarAngle={Math.PI / 8} maxPolarAngle={Math.PI / 2.25} />
 }

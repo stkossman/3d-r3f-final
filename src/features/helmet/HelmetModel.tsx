@@ -2,19 +2,20 @@ import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei/core/Gltf'
 import { useTexture } from '@react-three/drei/core/Texture'
-import { Html } from '@react-three/drei/web/Html'
+import { HelmetNotes } from './HelmetNotes'
 import { Box3, Group, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, SRGBColorSpace, Vector3, type Texture } from 'three'
 import { createHelmetMaterial, HELMET_PARTS } from './helmetMaterials'
-import { HELMET_HOTSPOTS, SHELL_COLORS, VISOR_COLORS, type HelmetConfiguration, type HotspotId } from './helmetConfiguration'
+import { SHELL_COLORS, VISOR_COLORS, type HelmetConfiguration, type HotspotId } from './helmetConfiguration'
 
 type HelmetModelProps = {
   configuration: HelmetConfiguration
   showHotspots: boolean
   selectedHotspot: HotspotId | null
   onHotspot: (id: HotspotId) => void
+  onCloseNote: () => void
 }
 
-export function HelmetModel({ configuration, showHotspots, selectedHotspot, onHotspot }: HelmetModelProps) {
+export function HelmetModel({ configuration, showHotspots, selectedHotspot, onHotspot, onCloseNote }: HelmetModelProps) {
   const { scene } = useGLTF('/models/helmet.glb', false, true)
   const toneMap = useTexture('/models/shell-tone.webp')
   const ownedToneMap = useRef<Texture | null>(null)
@@ -85,13 +86,7 @@ export function HelmetModel({ configuration, showHotspots, selectedHotspot, onHo
   return (
     <>
       <primitive object={model} dispose={null} />
-      {showHotspots && HELMET_HOTSPOTS.map((hotspot, index) => (
-        <Html key={hotspot.id} position={[...hotspot.position]} center occlude zIndexRange={[10, 0]}>
-          <button type="button" aria-label={`Inspect ${hotspot.label.toLowerCase()}`} aria-pressed={selectedHotspot === hotspot.id}
-            className={`flex size-11 cursor-pointer items-center justify-center rounded-full border border-ivory bg-graphite text-xs text-ivory hover:border-signal aria-pressed:border-signal aria-pressed:text-signal ${(selectedHotspot ?? 'shell') !== hotspot.id ? 'max-[680px]:hidden' : ''}`}
-            onPointerDown={(event) => event.stopPropagation()} onClick={() => onHotspot(hotspot.id)}>{String(index + 1).padStart(2, '0')}</button>
-        </Html>
-      ))}
+      {showHotspots && <HelmetNotes selected={selectedHotspot} onSelect={onHotspot} onClose={onCloseNote} />}
     </>
   )
 }

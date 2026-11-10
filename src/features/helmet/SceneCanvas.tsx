@@ -3,18 +3,24 @@ import { ACESFilmicToneMapping, PCFShadowMap, SRGBColorSpace } from 'three'
 import { useEffect, useState, type RefObject } from 'react'
 import { ViewerFallback } from './ProductViewer'
 import { SceneCamera, type ViewerCameraHandle } from './SceneCamera'
-import { ProductStage } from './ProductStage'
+import type { LightingConfiguration } from './studioLighting'
+import { CinematicRig } from './CinematicRig'
+import type { MotionValue } from 'motion/react'
+import { ProductStage, StudioLighting } from './ProductStage'
 import { HelmetModel } from './HelmetModel'
 import type { HelmetConfiguration, HotspotId } from './helmetConfiguration'
 
 type SceneCanvasProps = {
   cameraRef: RefObject<ViewerCameraHandle | null>
-  touchActive: boolean
+  inspecting: boolean
+  progress: MotionValue<number>
   onReady: (ready: boolean) => void
   configuration: HelmetConfiguration
+  lighting: LightingConfiguration
   showHotspots: boolean
   selectedHotspot: HotspotId | null
   onHotspot: (id: HotspotId) => void
+  onCloseNote: () => void
 }
 
 function RendererLifecycle({ onReady, onFailure }: Pick<SceneCanvasProps, 'onReady'> & { onFailure: (failed: boolean) => void }) {
@@ -35,17 +41,17 @@ function RendererLifecycle({ onReady, onFailure }: Pick<SceneCanvasProps, 'onRea
   return null
 }
 
-export default function SceneCanvas({ cameraRef, touchActive, onReady, configuration, showHotspots, selectedHotspot, onHotspot }: SceneCanvasProps) {
+export default function SceneCanvas({ cameraRef, inspecting, progress, onReady, configuration, lighting, showHotspots, selectedHotspot, onHotspot, onCloseNote }: SceneCanvasProps) {
   const [failed, setFailed] = useState(false)
   if (failed) return <ViewerFallback />
 
   return (
     <Canvas
-      className={touchActive ? 'pointer-events-auto!' : 'pointer-events-none! [@media(pointer:fine)]:pointer-events-auto!'}
+      className={inspecting ? 'pointer-events-auto!' : 'pointer-events-none!'}
       frameloop="demand"
       dpr={[1, 1.5]}
       shadows={{ type: PCFShadowMap }}
-      camera={{ position: [4, 3, 5], fov: 35, near: 0.1, far: 40 }}
+      camera={{ position: [4, 3, -5], fov: 35, near: 0.1, far: 40 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'default' }}
       fallback={<ViewerFallback />}
       onCreated={({ gl }) => {
@@ -58,9 +64,12 @@ export default function SceneCanvas({ cameraRef, touchActive, onReady, configura
       <color attach="background" args={['#181b21']} />
       <fog attach="fog" args={['#181b21', 9, 18]} />
       <RendererLifecycle onReady={onReady} onFailure={setFailed} />
-      <SceneCamera ref={cameraRef} />
-      <ProductStage />
-      <HelmetModel configuration={configuration} showHotspots={showHotspots} selectedHotspot={selectedHotspot} onHotspot={onHotspot} />
+      <SceneCamera ref={cameraRef} enabled={inspecting} />
+      <StudioLighting configuration={lighting} />
+      <CinematicRig progress={progress} inspecting={inspecting} noteOpen={showHotspots && selectedHotspot !== null}>
+        <ProductStage />
+        <HelmetModel configuration={configuration} showHotspots={showHotspots} selectedHotspot={selectedHotspot} onHotspot={onHotspot} onCloseNote={onCloseNote} />
+      </CinematicRig>
     </Canvas>
   )
 }
