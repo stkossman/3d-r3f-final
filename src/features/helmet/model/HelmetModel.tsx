@@ -13,7 +13,11 @@ import {
   Vector3,
   type Texture,
 } from 'three'
-import { createHelmetMaterial, HELMET_PARTS } from './helmetMaterials'
+import {
+  configureRearShellTint,
+  createHelmetMaterial,
+  HELMET_PARTS,
+} from './helmetMaterials'
 import {
   SHELL_COLORS,
   VISOR_COLORS,
@@ -42,8 +46,16 @@ export function HelmetModel({
   ...scan
 }: HelmetModelProps) {
   const { scene } = useGLTF('/models/helmet.glb', false, true)
-  const toneMap = useTexture('/models/shell-tone.webp')
-  const ownedToneMap = useRef<Texture | null>(null)
+  const [toneMap, rearToneMap, visorToneMap] = useTexture([
+    '/models/shell-tone.webp',
+    '/models/rear-shell-tone.webp',
+    '/models/visor-tone.webp',
+  ])
+  const ownedToneMaps = useRef<{
+    shell: Texture
+    visor: Texture
+  } | null>(null)
+  const rearTint = useRef<ReturnType<typeof configureRearShellTint> | null>(null)
   const invalidate = useThree((state) => state.invalidate)
   const model = useMemo(() => {
     const instance = scene.clone(true)
@@ -71,10 +83,14 @@ export function HelmetModel({
 
   useLayoutEffect(() => {
     const release: (() => void)[] = []
-    const texture = toneMap.clone()
-    texture.colorSpace = SRGBColorSpace
-    texture.flipY = false
-    ownedToneMap.current = texture
+    const textures = [toneMap, rearToneMap, visorToneMap].map((source) => {
+      const texture = source.clone()
+      texture.colorSpace = SRGBColorSpace
+      texture.flipY = false
+      return texture
+    })
+    const [shellTexture, rearTexture, visorTexture] = textures
+    ownedToneMaps.current = { shell: shellTexture, visor: visorTexture }
     model.traverse((object) => {
       if (
         !(object instanceof Mesh) ||
@@ -83,6 +99,9 @@ export function HelmetModel({
         return
       const original = object.material
       const material = createHelmetMaterial(original, object.name)
+      if (object.name === HELMET_PARTS.components) {
+        rearTint.current = configureRearShellTint(material, rearTexture)
+      }
       object.material = material
       release.push(() => {
         object.material = original
@@ -92,10 +111,11 @@ export function HelmetModel({
     invalidate()
     return () => {
       release.forEach((dispose) => dispose())
-      texture.dispose()
-      ownedToneMap.current = null
+      textures.forEach((texture) => texture.dispose())
+      ownedToneMaps.current = null
+      rearTint.current = null
     }
-  }, [model, toneMap, invalidate])
+  }, [model, toneMap, rearToneMap, visorToneMap, invalidate])
 
   useLayoutEffect(() => {
     const shell = model.getObjectByName(HELMET_PARTS.shell)
@@ -110,7 +130,7 @@ export function HelmetModel({
       material.map =
         configuration.shell === 'original'
           ? original.material.map
-          : ownedToneMap.current
+          : (ownedToneMaps.current?.shell ?? null)
       material.color.set(SHELL_COLORS[configuration.shell])
       material.roughness = configuration.finish === 'gloss' ? 0.38 : 0.9
       material.roughnessMap =
@@ -120,17 +140,24 @@ export function HelmetModel({
         configuration.finish === 'gloss' ? 0.16 : 0.6
       material.needsUpdate = true
     }
+    if (rearTint.current) {
+      rearTint.current.uRearShellEnabled.value =
+        configuration.shell === 'original' ? 0 : 1
+      rearTint.current.uRearShellColor.value.set(SHELL_COLORS[configuration.shell])
+    }
     const visor = model.getObjectByName(HELMET_PARTS.visor)
     if (
       visor instanceof Mesh &&
       visor.material instanceof MeshStandardMaterial
     ) {
+      visor.material.map = ownedToneMaps.current?.visor ?? null
       visor.material.color.set(VISOR_COLORS[configuration.visor])
       visor.material.roughness = configuration.visor === 'smoke' ? 0.19 : 0.12
       visor.material.metalness = configuration.visor === 'smoke' ? 0.65 : 0.9
+      visor.material.needsUpdate = true
     }
     invalidate()
-  }, [model, scene, toneMap, configuration, invalidate])
+  }, [model, scene, toneMap, rearToneMap, visorToneMap, configuration, invalidate])
 
   useDiagnosticScan(model, scan)
 

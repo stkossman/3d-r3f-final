@@ -1,4 +1,42 @@
-import { FrontSide, MeshPhysicalMaterial, MeshStandardMaterial } from 'three'
+import {
+  Color,
+  FrontSide,
+  MeshPhysicalMaterial,
+  MeshStandardMaterial,
+  Uniform,
+  type Texture,
+} from 'three'
+import rearShellFragment from '../shaders/rearShell.frag.glsl'
+
+export function configureRearShellTint(
+  material: MeshStandardMaterial,
+  toneMap: Texture,
+) {
+  const uniforms = {
+    uRearShellMap: new Uniform(toneMap),
+    uRearShellColor: new Uniform(new Color()),
+    uRearShellEnabled: new Uniform(0),
+  }
+  const originalCompile = material.onBeforeCompile
+  const baseKey = material.customProgramCacheKey()
+  material.onBeforeCompile = (shader, renderer) => {
+    originalCompile.call(material, shader, renderer)
+    Object.assign(shader.uniforms, uniforms)
+    shader.fragmentShader =
+      rearShellFragment +
+      '\n' +
+      shader.fragmentShader.replace(
+        '#include <map_fragment>',
+        `#include <map_fragment>
+        #ifdef USE_MAP
+          diffuseColor.rgb = apexRearShellColor(diffuseColor.rgb, vMapUv);
+        #endif`,
+      )
+  }
+  material.customProgramCacheKey = () => `${baseKey}/apex-rear-shell-v1`
+  material.needsUpdate = true
+  return uniforms
+}
 
 export const HELMET_PARTS = {
   shell: 'Helmet_main_Helmet_main_0',

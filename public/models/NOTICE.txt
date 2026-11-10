@@ -12,5 +12,9 @@ with Meshopt. Four mesh identities and original livery are retained.
 Runtime material variants and display normalization are applied in the viewer.
 shell-tone.webp is an additional monochrome/tonal derivative of the shell
 base-color texture for custom colors. The factory variant retains the livery.
+rear-shell-tone.webp is a tonal component-texture derivative with an alpha mask
+limited to the rear spoiler UVs. visor-tone.webp neutralizes baked visor hues
+while retaining graphic shapes and source alpha for the three visor tints.
+Reproduce these two maps with bun scripts/prepare-helmet-customization.mjs.
 No endorsement by the original author, driver, teams, or sponsors is implied.
 Third-party trademarks and livery remain the property of their owners.
