@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "threejs-physics": {
+      "source": "cesartevisual/threejs-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-physics/SKILL.md",
+      "computedHash": "2790b189199ac3c8f5b7d143564db951c93eba8af1306217945754fe3e33ea94"
+    },
+    "threejs-product-viewer": {
+      "source": "cesartevisual/threejs-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-product-viewer/SKILL.md",
+      "computedHash": "8af1bbf1363dc9be1e23bbf58d43ebcee8db1d0bd8c122ebffb9f00474acca6a"
+    },
+    "threejs-r3f": {
+      "source": "cesartevisual/threejs-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-r3f/SKILL.md",
+      "computedHash": "c49e6e0fab4f449909556e1371e82c4dbabd58800064a1a14db64712587dc718"
+    },
+    "threejs-shaders": {
+      "source": "cesartevisual/threejs-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-shaders/SKILL.md",
+      "computedHash": "720109441290a4abacb3b4f729b6e11a7f5c163c00627214d74aba11de2548c2"
+    },
+    "threejs-web": {
+      "source": "cesartevisual/threejs-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-web/SKILL.md",
+      "computedHash": "de3c726eb3c46042dea5212688e3414ab925d15e107286a772a015a97bc5c7a5"
+    }
+  }
+}

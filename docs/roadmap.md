@@ -1,0 +1,16 @@
+# Delivery roadmap
+
+Stages are sequential review boundaries. Implement only the stage requested; completion requires its criteria and the project's typecheck, lint, and build checks. Stage 0 browser automation is excluded. Later stages should add focused interaction and device verification when the behavior exists.
+
+| Stage | Goal and deliverables | Completion criteria |
+| --- | --- | --- |
+| 0 — Foundation & design direction | DOM shell, design tokens, typography, tooling, model review, architecture, project instructions | Explicit upcoming modes and viewer reservation; responsive styles and accessible semantics; candidate selection with evidence/uncertainty; checks pass; no 3D features, deployment, or model conversion |
+| 1 — Product scene | Validate and optimize selected model; single R3F Canvas; neutral product lighting; shadows; primitive display surface; responsive framing; loading/error/WebGL fallback | Licensed derivative and attribution; complex model plus meaningful Three.js primitive visible; correct orientation/material baseline; useful mobile framing; model failure preserves DOM UI; performance baseline recorded |
+| 2 — Explore | Constrained camera interaction, reset view, anchored technical hotspots, visor animation | Keyboard-accessible equivalent controls; stable camera on resize; hotspots and content verified against model evidence; correct hinge; reduced-motion behavior; animation cancels/resets cleanly |
+| 3 — Design | Shell finishes/colors, custom physical materials, visor treatments, shared configuration where needed | Valid options update only intended instance-owned materials; reset restores defaults; representative combinations tested; no shared-cache mutation or resource leak |
+| 4 — Impact Lab | Rapier rigid bodies, measured units, floor/colliders, gravity/impact controls, reset, illustrative impact display | Fixed timestep and bounded catch-up; stable resting/fast collision behavior; repeated reset and tab-resume verified; transforms have one owner; simulation carries no safety-performance claims |
+| 5 — Shader study | Purposeful custom GLSL effect integrated with the helmet or impact visualization | Documented coordinates/uniforms; real shader visible and compiling; parameter extremes, shadows/bounds, resizing and fallback checked; effect remains legible and within frame budget |
+| 6 — Rendering & performance | Final lighting, selective postprocessing, adaptive quality, asset and frame profiling | Color/alpha/shadows correct; desktop/mobile budgets measured; graceful reduced-quality path; loading and memory reviewed; modes remain responsive |
+| 7 — Delivery & defense | Accessibility/device QA, source explanation, asset credits, final docs, Vercel deployment when explicitly authorized | All nine academic requirements evidenced; reproducible Bun build and checks; authorized production deployment verified; known limitations and performance results documented; no unlicensed assets or source archives published |
+
+Academic mapping: primitives, complex models, lighting, and shadows start in Stage 1; animation in Stage 2; custom materials in Stage 3; physics in Stage 4; custom GLSL in Stage 5; high-quality rendering is consolidated in Stage 6. Deployment and the final source-level explanation belong to Stage 7.
