@@ -5,11 +5,36 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#111318" />
+    <style id="apex-boot-style">
+      :root { color-scheme: dark; background: #111318; }
+      #apex-boot { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; justify-content: space-between; padding: 2rem clamp(1.25rem, 5vw, 6rem); background: #111318; color: #f1f0eb; font-family: 'Barlow', sans-serif; }
+      #apex-boot small { font-size: 0.625rem; letter-spacing: 0.14em; color: #8c939e; }
+      #apex-boot strong { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: clamp(4.5rem, 19vw, 18rem); font-weight: 600; line-height: 0.85; letter-spacing: -0.035em; white-space: nowrap; }
+      #apex-boot strong i { color: #ff6547; font-style: normal; }
+      #apex-boot p { font-size: 0.75rem; letter-spacing: 0.14em; margin-top: 2rem; }
+      #apex-boot footer { border-top: 1px solid #34373e; padding-top: 1rem; }
+      #apex-boot a { color: #f1f0eb; }
+    </style>
     <meta name="description" content="APEX / 01 — Interactive Motorsport Helmet Experience. Engineered for the edge. Currently in development." />
     <title>APEX / 01 — Interactive Motorsport Helmet Experience</title>
   </head>
   <body>
+    <div id="apex-boot" aria-label="Preparing the APEX experience">
+      <small>MOTORSPORT / PRODUCT STUDY</small>
+      <div><strong>APEX <i>/</i> 01</strong><p>ENGINEERED FOR THE EDGE.</p></div>
+      <footer><small id="apex-boot-status" role="status">INITIALIZING STUDIO</small> <a id="apex-boot-retry" href="" hidden>Reload experience</a></footer>
+    </div>
+    <script>
+      window.setTimeout(function () {
+        var status = document.getElementById('apex-boot-status');
+        if (status) {
+          status.textContent = 'The application could not start. Reload to retry.';
+          document.getElementById('apex-boot-retry').hidden = false;
+        }
+      }, 45000);
+    </script>
     <div id="root"></div>
+    <noscript><style>#apex-boot { display: none; }</style></noscript>
     <noscript>APEX / 01 is an interactive motorsport helmet experience in development. Enable JavaScript to view the application.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -10,6 +10,7 @@ export const HELMET_PARTS = {
 export function createHelmetMaterial(source: MeshStandardMaterial, meshName: string) {
   const material = source.clone()
   material.envMapIntensity = 0.85
+  material.dithering = true
   if (meshName === HELMET_PARTS.shell) {
     material.side = FrontSide
     material.metalness = 0.08

@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
+import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import { useLenis } from 'lenis/react'
 import { ArrowDown, Minus, Plus, RotateCcw, RotateCw } from 'lucide-react'
 import { motion, useMotionValue, useScroll, useTransform } from 'motion/react'
@@ -9,6 +9,9 @@ import { DesignControls } from './DesignControls'
 import { FACTORY_CONFIGURATION, type HelmetConfiguration, type HotspotId } from './helmetConfiguration'
 import { ImpactControls } from './ImpactControls'
 import { useImpactLab } from './impactSimulation'
+import { CinematicPreloader } from './CinematicPreloader'
+import type { SceneLoadState } from './sceneLoading'
+import type { ScanStatus } from './useDiagnosticScan'
 import { CHECKPOINTS } from './scrollChoreography'
 import { useReducedMotion } from './useReducedMotion'
 
@@ -21,9 +24,10 @@ export function ViewerFallback({ loading = false }: { loading?: boolean }) {
   </div>
 }
 
-class ViewerBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+class ViewerBoundary extends Component<{ children: ReactNode; onUnavailable: () => void }, { failed: boolean }> {
   state = { failed: false }
   static getDerivedStateFromError() { return { failed: true } }
+  componentDidCatch() { this.props.onUnavailable() }
   render() { return this.state.failed ? <ViewerFallback /> : this.props.children }
 }
 
@@ -34,12 +38,21 @@ const headingClass = 'font-display text-5xl leading-none uppercase min-[1200px]:
 export function ProductViewer() {
   const camera = useRef<ViewerCameraHandle>(null)
   const narrative = useRef<HTMLElement>(null)
-  const [ready, setReady] = useState(false)
+  const [sceneState, setSceneState] = useState<SceneLoadState>('loading')
+  const [revealed, setRevealed] = useState(false)
+  const ready = sceneState === 'ready'
+  const handleSceneReady = useCallback((value: boolean) => {
+    setSceneState((state) => state === 'unavailable' ? state : value ? 'ready' : 'loading')
+  }, [])
+  const handleUnavailable = useCallback(() => setSceneState('unavailable'), [])
+  const reveal = useCallback(() => setRevealed(true), [])
   const [inspecting, setInspecting] = useState(false)
   const [active, setActive] = useState(0)
   const [configuration, setConfiguration] = useState<HelmetConfiguration>(FACTORY_CONFIGURATION)
   const [lighting, setLighting] = useState<LightingConfiguration>(DEFAULT_LIGHTING)
   const [selectedHotspot, setSelectedHotspot] = useState<HotspotId | null>(null)
+  const [scanRequest, setScanRequest] = useState(0)
+  const [scanStatus, setScanStatus] = useState<ScanStatus>('ready')
   const [impactFramed, setImpactFramed] = useState(false)
   const impact = useImpactLab()
   const impactActive = active === 4
@@ -54,6 +67,22 @@ export function ProductViewer() {
   useEffect(() => {
     if (inspecting) lenis?.scrollTo(window.scrollY, { immediate: true })
   }, [inspecting, lenis])
+
+  useEffect(() => {
+    if (revealed) return
+    // Restore the requested checkpoint after initial content/controls have their final layout.
+    try {
+      const target = document.getElementById(decodeURIComponent(window.location.hash.slice(1)))
+      if (target) {
+        if (lenis) lenis.scrollTo(target, { immediate: true })
+        else target.scrollIntoView({ behavior: 'instant' })
+      }
+    } catch { /* An invalid URL fragment must not prevent access to the page. */ }
+  }, [revealed, lenis, ready])
+
+  useEffect(() => {
+    if (revealed) narrative.current?.focus({ preventScroll: true })
+  }, [revealed])
 
   function navigateToSection(event: MouseEvent<HTMLDivElement>) {
     if (!lenis || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
@@ -110,7 +139,9 @@ export function ProductViewer() {
   }
 
   return (
-    <div id="top" className="bg-surface" onClick={navigateToSection}>
+    <>
+      {!revealed && <CinematicPreloader state={sceneState} onUnavailable={handleUnavailable} onReveal={reveal} />}
+    <div id="top" inert={!revealed} aria-hidden={!revealed || undefined} className="bg-surface" onClick={navigateToSection}>
       <a href="#main" className="fixed top-4 left-page z-[80] -translate-y-[200%] bg-ivory p-3 text-graphite focus:translate-y-0">Skip to content</a>
       <header className="fixed inset-x-0 top-0 z-[60] flex min-h-20 items-center justify-between gap-3 border-b border-line bg-surface px-page max-[380px]:px-3">
         <a href="#intro" aria-label="APEX / 01 home" className="shrink-0 whitespace-nowrap font-display text-2xl font-semibold tracking-[-0.035em]">APEX <span className="text-steel">/ 01</span></a>
@@ -120,11 +151,11 @@ export function ProductViewer() {
         </nav>
       </header>
       <div data-lenis-prevent={effectiveInspecting ? true : undefined} className={`fixed inset-x-0 top-20 z-10 h-[44svh] min-[900px]:top-0 min-[900px]:h-svh ${annotationOpen ? "short-landscape:h-[calc(100svh_-_5rem)]" : ""}`} aria-label="Persistent helmet studio">
-        <ViewerBoundary><Suspense fallback={<ViewerFallback loading />}>
-          <SceneCanvas onImpactFramed={setImpactFramed} impactActive={impactActive} impactSettings={impact.settings} impactHandle={impact.handle} onImpactTelemetry={impact.setTelemetry} cameraRef={camera} inspecting={effectiveInspecting} progress={progress} onReady={setReady} configuration={configuration} lighting={lighting}
+        {sceneState === 'unavailable' ? <ViewerFallback /> : <ViewerBoundary onUnavailable={handleUnavailable}><Suspense fallback={<ViewerFallback loading />}>
+          <SceneCanvas scanRequest={scanRequest} onScanStatus={setScanStatus} impactCollisions={impact.telemetry.collisions} onImpactFramed={setImpactFramed} impactActive={impactActive} impactSettings={impact.settings} impactHandle={impact.handle} onImpactTelemetry={impact.setTelemetry} cameraRef={camera} inspecting={effectiveInspecting} progress={progress} onReady={handleSceneReady} onUnavailable={handleUnavailable} configuration={configuration} lighting={lighting}
             showHotspots={active === 1} selectedHotspot={selectedHotspot} onHotspot={(id) => setSelectedHotspot((current) => current === id ? null : id)} onCloseNote={closeNote} />
-        </Suspense></ViewerBoundary>
-        <p className="pointer-events-none absolute top-4 right-page text-[0.625rem] tracking-[0.12em] text-steel min-[900px]:top-24">{ready ? 'F1 / ZHOU GUANYU 24' : 'PREPARING STUDIO'}</p>
+        </Suspense></ViewerBoundary>}
+        <p className="pointer-events-none absolute top-4 right-page text-[0.625rem] tracking-[0.12em] text-steel min-[900px]:top-24">{ready ? 'F1 / ZHOU GUANYU 24' : sceneState === 'unavailable' ? 'STUDIO UNAVAILABLE' : 'PREPARING STUDIO'}</p>
       </div>
       <main id="main" tabIndex={-1} className={`pointer-events-none relative z-20 ${annotationOpen ? "short-landscape:invisible" : ""}`} ref={narrative}>
         <section id="intro" aria-labelledby="hero-title" className={sectionClass}>
@@ -141,6 +172,8 @@ export function ProductViewer() {
             <p className="mt-6 max-w-[36ch] text-sm leading-relaxed text-steel">Explore the visible shell, visor and front intake. Choose a numbered marker on the helmet to read its component note.</p>
             <p className="mt-4 max-w-[36ch] text-xs leading-relaxed text-steel">A visual study of the source geometry. No certification, construction or impact performance is inferred.</p>
             <button type="button" disabled={!ready} onClick={() => setInspecting(true)} className={`${buttonClass} pointer-events-auto mt-7`}>Inspect the helmet</button>
+            <button type="button" disabled={!ready || active !== 1 || scanStatus !== 'ready'} onClick={() => setScanRequest((request) => request + 1)} className={`${buttonClass} pointer-events-auto mt-3`}>{scanStatus === 'scanning' ? 'Scanning shell...' : 'Diagnostic scan'}</button>
+            <p role="status" className="mt-3 text-xs leading-relaxed text-steel">{scanStatus === 'unavailable' ? 'Scan unavailable. The material study remains available.' : scanStatus === 'scanning' ? 'Surface scan in progress. Illustrative visualization.' : 'Trace the shell surface with a diagnostic sweep.'}</p>
           </div>
         </section>
         <section id="design" aria-labelledby="design-title" className={`${sectionClass} min-[900px]:justify-end`}>
@@ -185,5 +218,6 @@ export function ProductViewer() {
         </div>
       </div>
     </div>
+    </>
   )
 }

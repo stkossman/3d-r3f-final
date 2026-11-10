@@ -6,8 +6,9 @@ import { HelmetNotes } from './HelmetNotes'
 import { Box3, Group, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, SRGBColorSpace, Vector3, type Texture } from 'three'
 import { createHelmetMaterial, HELMET_PARTS } from './helmetMaterials'
 import { SHELL_COLORS, VISOR_COLORS, type HelmetConfiguration, type HotspotId } from './helmetConfiguration'
+import { useDiagnosticScan, type DiagnosticScanProps } from './useDiagnosticScan'
 
-type HelmetModelProps = {
+type HelmetModelProps = DiagnosticScanProps & {
   configuration: HelmetConfiguration
   showHotspots: boolean
   selectedHotspot: HotspotId | null
@@ -15,7 +16,7 @@ type HelmetModelProps = {
   onCloseNote: () => void
 }
 
-export function HelmetModel({ configuration, showHotspots, selectedHotspot, onHotspot, onCloseNote }: HelmetModelProps) {
+export function HelmetModel({ configuration, showHotspots, selectedHotspot, onHotspot, onCloseNote, ...scan }: HelmetModelProps) {
   const { scene } = useGLTF('/models/helmet.glb', false, true)
   const toneMap = useTexture('/models/shell-tone.webp')
   const ownedToneMap = useRef<Texture | null>(null)
@@ -82,6 +83,8 @@ export function HelmetModel({ configuration, showHotspots, selectedHotspot, onHo
     }
     invalidate()
   }, [model, scene, toneMap, configuration, invalidate])
+
+  useDiagnosticScan(model, scan)
 
   return (
     <>
