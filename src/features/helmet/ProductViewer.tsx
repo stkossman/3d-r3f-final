@@ -161,7 +161,7 @@ export function ProductViewer() {
           <div className="pointer-events-auto w-full min-[900px]:w-[32%]">
             <h2 id="impact-title" className={headingClass}>From form<br />to force.</h2>
             <p className="mt-5 max-w-[35ch] text-sm leading-relaxed text-steel">Release the helmet. Observe gravity, rotation and contact on a rigid testing surface.</p>
-            <ImpactControls settings={impact.settings} telemetry={impact.telemetry} onSettings={impact.setSettings} onCommand={impact.command} available={ready && impactActive && impactFramed} />
+            <ImpactControls settings={impact.settings} telemetry={impact.telemetry} onSettings={impact.setSettings} onCommand={impact.command} available={ready && impactActive} framed={impactFramed} />
             <p className="mt-4 text-xs leading-relaxed text-steel">Illustrative rigid-body experiment. Assumed length 0.34 m / mass 1.5 kg. Simplified solid colliders; no deformation or safety certification.</p>
           </div>
         </section>
