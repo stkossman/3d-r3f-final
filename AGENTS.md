@@ -1,20 +1,21 @@
 # APEX / 01 project instructions
 
-APEX / 01 is an Interactive Motorsport Helmet Experience for a university final project. Read README.md, docs/architecture.md, docs/asset-review.md, and docs/roadmap.md before changing the relevant area. The requested development stage is the scope boundary. Stage 0 is DOM-only: do not add a Canvas, model loading, camera controls, configuration, physics, shaders, or postprocessing.
+APEX / 01 is an Interactive Motorsport Helmet Experience for a university final project. Read README.md, docs/architecture.md, docs/asset-review.md, and docs/roadmap.md before changing the relevant area. The requested development stage is the scope boundary. Stage 1 adds a primitive product scene and camera controls; actual model integration starts in Stage 2. Do not add configuration, physics, shaders, or postprocessing before their requested stages.
 
 ## Workflow
 
 - Inspect the code, installed versions, Git status, and existing changes first. Preserve user work.
 - Use Bun exclusively: `bun install --frozen-lockfile`, `bun add`, `bunx`, and `bun run`. Preserve bun.lock; do not add other lockfiles or upgrade packages without a concrete need.
 - Before delivery run `bun run typecheck`, `bun run lint`, and `bun run build`. Report actual results and anything unverified. Do not introduce a testing framework without meaningful behavior to verify. Do not run Playwright or extensive browser automation for Stage 0.
-- Do not commit, push, create/update PRs, or deploy without an explicit request. Stage 0 works on `feat/apex-foundation`.
+- Do not commit, push, create/update PRs, or deploy without an explicit request. Stage 1 works on `feat/apex-scene-foundation`.
 - Keep changes focused, proportionate, and reviewable. Stop at requested review boundaries. Suggest a Conventional Commit message after implementation.
 
 ## Code and design
 
 - Strict TypeScript, descriptive names, function components, relative imports, and existing ESLint conventions. Avoid any, unsafe casts, unnecessary effects/memoization, and invented shared types.
 - Prefer composition, small cohesive modules, and local/derived state. Add feature directories only when they contain implemented behavior. No generic frameworks, pass-through helpers, speculative stores, or new dependencies for appearance.
-- Separate semantic DOM UI from R3F components. All product copy and user controls remain accessible HTML. Keep tokens in src/index.css and shell styles in src/App.css; preserve the Industrial Editorial / Motorsport Minimalism direction.
+- Separate semantic DOM UI from R3F components. All product copy and user controls remain accessible HTML. Preserve the Industrial Editorial / Motorsport Minimalism direction.
+- Tailwind CSS first: use utilities directly in JSX/TSX for layout, spacing, sizing, typography, colors, borders, responsive behavior, interaction states, and standard transitions. Keep design tokens and global base styles in src/index.css, inside appropriate Tailwind layers. CSS is reserved for tokens, fonts, resets, reusable keyframes, complex animations, third-party requirements, or exceptional styles utilities cannot express cleanly. Do not add component stylesheets, CSS modules, utility-duplicating stylesheets, or inline React style objects for ordinary DOM styles. Runtime-calculated 3D values are allowed.
 - Use the existing graphite/ivory/steel palette and sparse signal orange. Bundle fonts through Fontsource packages with their license notices; do not download separate font binaries. Maintain responsive composition, keyboard focus, contrast, and reduced-motion support. Never present planned functionality as working controls.
 
 ## Three.js and assets
